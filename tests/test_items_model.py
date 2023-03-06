@@ -10,10 +10,9 @@ import os
 import logging
 import unittest
 from werkzeug.exceptions import NotFound
-from service.models import Wishlists,Items, DataValidationError, db
+from service.models import Wishlists, Items, DataValidationError, db
 from service import app
 from tests.factories import ItemsFactory, WishlistsFactory
-import datetime
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -36,7 +35,6 @@ class TestItemsModel(unittest.TestCase):
         app.logger.setLevel(logging.CRITICAL)
         Items.init_db(app)
         Wishlists.init_db(app)
-
 
     @classmethod
     def tearDownClass(cls):
@@ -68,37 +66,42 @@ class TestItemsModel(unittest.TestCase):
         self.assertEqual(item.item_quantity, 1)
 
     def test_add_item(self):
-        """Creates an Item and adds it to the database."""        
+        """Creates an Item and adds it to the database."""
+
         wish = Wishlists.all()
         self.assertEqual(wish, [])
-        items = Items.all()        
-        self.assertEqual(items, [])        
-        #Create a wishlist.
-        wishlist = WishlistsFactory() 
-        wishlist.wishlist_id = None           
-        wishlist.create()  
-        #Create an item, and link it to the wishlist created above.      
-        item = Items(product_name="first item",product_id=3, wishlist_id=wishlist.wishlist_id, item_quantity=1)
+        items = Items.all()
+        self.assertEqual(items, [])
+        # Create a wishlist.
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        # Create an item, and link it to the wishlist created above.
+        item = Items(product_name="first item",
+                     product_id=3,
+                     wishlist_id=wishlist.wishlist_id,
+                     item_quantity=1)
         self.assertTrue(item is not None)
         self.assertEqual(item.item_id, None)
         item.create()
-        #Check that its assigned an id, and is present in our database.
+        # Check that its assigned an id, and is present in our database.
         self.assertIsNotNone(item.item_id)
         items = Items.all()
         self.assertEqual(len(items), 1)
 
     def test_read_item(self):
         """Reads an Item from the database."""
-        #Create a wishlist and add an Item to it.
+
+        # Create a wishlist and add an Item to it.
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
         wishlist.create()
-        item = ItemsFactory()        
+        item = ItemsFactory()
         item.item_id, item.wishlist_id = None, wishlist.wishlist_id
         item.create()
         self.assertIsNotNone(item.item_id)
-        
-        #Read created item from the database, and verify that it has correct fields.
+
+        # Read created item from the database, and verify that it has correct fields.
         fetch_item = Items.find(item.item_id)
         self.assertEqual(fetch_item.item_id, item.item_id)
         self.assertEqual(fetch_item.product_name, item.product_name)
@@ -106,49 +109,48 @@ class TestItemsModel(unittest.TestCase):
         self.assertEqual(fetch_item.product_id, item.product_id)
         self.assertEqual(fetch_item.item_quantity, item.item_quantity)
 
-
     def test_update_item(self):
         """Updates an Item in the Database"""
-        #Create a wishlist and a specific product.
+
+        # Create a wishlist and a specific product.
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
         wishlist.create()
         item = ItemsFactory()
-        item.item_id, item.wishlist_id, item.product_id = None, wishlist.wishlist_id, 5                        
+        item.item_id, item.wishlist_id, item.product_id = None, wishlist.wishlist_id, 5
         item.create()
-        logging.debug(f"Original Item:{item}")  
+        logging.debug("Original Item: %s", item)
 
-        #Making sure item exists.
+        # Making sure item exists.
         self.assertIsNotNone(item.item_id)
 
-        #Changing product_id, product_name and quantity        
-        #Storing original item information
+        # Changing product_id, product_name and quantity
+        # Storing original item information
         original_item_id = item.item_id
-        original_product_id, original_product_name, original_item_quantity = item.product_id, item.product_name, item.item_quantity
-        #Modifying item information
-        item.product_id= original_product_id+10
-        item.product_name="Modified Product"
+        original_product_id, original_item_quantity = item.product_id, item.item_quantity
+        # Modifying item information
+        item.product_id = original_product_id+10
+        item.product_name = "Modified Product"
         item.item_quantity = original_item_quantity+10
-        #Update item
+        # Update item
         item.update()
-        logging.debug(f"Modified Item:{item}")  
+        logging.debug("Modified Item: %s", item)
 
-        #1.Make sure item primary key has not changed.
+        # 1.Make sure item primary key has not changed
         self.assertEqual(item.item_id, original_item_id)
 
-        #2. Make sure fields are updated.
+        # 2. Make sure fields are updated.
         self.assertEqual(item.product_id, original_product_id+10)
-        self.assertEqual(item.product_name,"Modified Product")
+        self.assertEqual(item.product_name, "Modified Product")
         self.assertEqual(item.item_quantity, original_item_quantity+10)
 
-        #3. Fetch once more from DB and ensure fields are modified.                
+        # 3. Fetch once more from DB and ensure fields are modified
         items_from_db = Items.all()
         self.assertEqual(len(items_from_db), 1)
         test_item = items_from_db[0]
         self.assertEqual(test_item.product_id, original_product_id+10)
-        self.assertEqual(test_item.product_name,"Modified Product")
+        self.assertEqual(test_item.product_name, "Modified Product")
         self.assertEqual(test_item.item_quantity, original_item_quantity+10)
-
 
     def test_delete_item(self):
         """Deletes an Item in the Database."""
@@ -157,37 +159,35 @@ class TestItemsModel(unittest.TestCase):
         wishlist.create()
         item = ItemsFactory()
         item.wishlist_id = wishlist.wishlist_id
-        item.item_id=None
+        item.item_id = None
         item.create()
 
-        #Ensure there's a valid item ID
+        # Ensure there's a valid item ID
         self.assertIsNotNone(item.item_id)
 
-        #Ensure there is one item in the database.
+        # Ensure there is one item in the database.
         items_from_db = Items.all()
-        self.assertEqual(len(items_from_db),1)
-        
-        #Delete the item
+        self.assertEqual(len(items_from_db), 1)
+
+        # Delete the item
         item.delete()
 
-        #Fetch items again and ensure there are no items.
+        # Fetch items again and ensure there are no items.
         items_from_db_post_delete = Items.all()
-        self.assertEqual(len(items_from_db_post_delete),0)
-        
+        self.assertEqual(len(items_from_db_post_delete), 0)
 
     def test_update_no_id(self):
         """It should not Update a item without an id"""
-        #Create a Wishlist and an Item
+        # Create a Wishlist and an Item
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
         wishlist.create()
-        item = ItemsFactory()        
+        item = ItemsFactory()
         item.item_id = None
         item.wishlist_id = wishlist.wishlist_id
 
-        #Try updating the Item
+        # Try updating the Item
         self.assertRaises(DataValidationError, item.update)
-
 
     def test_list_all_items(self):
         """Lists all Items in the Database"""
@@ -195,75 +195,73 @@ class TestItemsModel(unittest.TestCase):
         wishlist.wishlist_id = None
         wishlist.create()
 
-        # Create 5 items 
+        # Create 5 items
         for _ in range(5):
             item = ItemsFactory()
-            item.item_id=None
+            item.item_id = None
             item.wishlist_id = wishlist.wishlist_id
             item.create()
 
-        #Check if we have 5 items in the DB
+        # Check if we have 5 items in the DB
         items_from_db = Items.all()
         self.assertEqual(len(items_from_db), 5)
-
 
     def test_serialize_item(self):
         """Tests Item serialization"""
 
         item = ItemsFactory()
-        serialized_data = item.serialize()                        
+        serialized_data = item.serialize()
 
-        #Ensure data has contents.
+        # Ensure data has contents.
         self.assertNotEqual(serialized_data, None)
 
-        #Ensure item has item-id
+        # Ensure item has item-id
         self.assertIn("item_id", serialized_data)
         self.assertEqual(serialized_data["item_id"], item.item_id)
 
-        #Ensure item has product_id
+        # Ensure item has product_id
         self.assertIn("product_id", serialized_data)
         self.assertEqual(serialized_data["product_id"], item.product_id)
 
-        #Ensure item has prouct name
+        # Ensure item has product name
         self.assertIn("product_name", serialized_data)
         self.assertEqual(serialized_data["product_name"], item.product_name)
 
-        #Ensure item has wishlist_id
+        # Ensure item has wishlist_id
         self.assertIn("wishlist_id", serialized_data)
         self.assertEqual(serialized_data["wishlist_id"], item.wishlist_id)
 
-        #Ensure item has quantity
+        # Ensure item has quantity
         self.assertIn("item_quantity", serialized_data)
         self.assertEqual(serialized_data["item_quantity"], item.item_quantity)
 
-
     def test_deserialize_item(self):
-        """Tests Item deserialisation"""
+        """Tests Item deserialization"""
 
-        #Create a wishlist, and an Item in the Wishlist.
+        # Create a wishlist, and an Item in the Wishlist.
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
         wishlist.create()
         item = ItemsFactory()
-        item.item_id=None
+        item.item_id = None
         item.wishlist_id = wishlist.wishlist_id
 
-        #data contains serialized dict
+        # data contains serialized dict
         data = item.serialize()
 
-        #Transfer dict info to items object
+        # Transfer dict info to items object
         item = Items()
         item.deserialize(data)
 
-        #Check if items object has valid data.
-        #1. Does it contain data
+        # Check if items object has valid data.
+        # 1. Does it contain data
         self.assertNotEqual(item, None)
         self.assertEqual(item.item_id, None)
 
-        #2. Check if contents are correct.
+        # 2. Check if contents are correct.
         self.assertEqual(data["wishlist_id"], item.wishlist_id)
         self.assertEqual(data["product_name"], item.product_name)
-        self.assertEqual(data["product_id"], item.product_id)        
+        self.assertEqual(data["product_id"], item.product_id)
         self.assertEqual(data["item_quantity"], item.item_quantity)
 
     def test_deserialize_missing_data(self):
