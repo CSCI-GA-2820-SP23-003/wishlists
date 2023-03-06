@@ -67,25 +67,22 @@ class TestItemsModel(unittest.TestCase):
         self.assertEqual(item.wishlist_id, 1)
         self.assertEqual(item.item_quantity, 1)
 
-    # def test_add_an_item(self):
-    #     """It should Create an item and add it to the database"""
-    #     wish = Wishlists.all()
-    #     self.assertEqual(wish, [])
-    #     items = Items.all()
-        
-    #     self.assertEqual(items, [])
-    #     # current_time = datetime.datetime.now()
-    #     wishlist = WishlistsFactory()
-    #     wishlist.wishlist_id=None
-    #     wishlist.create()
-    #     item = Items(product_name="first item", wishlist_id=1, item_quantity=1)
-    #     self.assertTrue(item is not None)
-    #     self.assertEqual(item.item_id, None)
-    #     item.create()
-    #     # Assert that it was assigned an id and shows up in the database
-    #     self.assertIsNotNone(item.item_id)
-    #     items = Items.all()
-    #     self.assertEqual(len(items), 1)
+    def test_add_an_item(self):
+        """It should Create an item and add it to the database"""
+        wish = Wishlists.all()
+        self.assertEqual(wish, [])
+        items = Items.all()        
+        self.assertEqual(items, [])        
+        wishlist = WishlistsFactory()            
+        wishlist.create()        
+        item = Items(product_name="first item",product_id=3, wishlist_id=wishlist.wishlist_id, item_quantity=1)
+        self.assertTrue(item is not None)
+        self.assertEqual(item.item_id, None)
+        item.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(item.item_id)
+        items = Items.all()
+        self.assertEqual(len(items), 1)
 
     # def test_read_a_item(self):
     #     """It should Read a item"""
