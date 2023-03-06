@@ -190,7 +190,7 @@ class Items(db.Model):
 
     def delete(self):
         """ Removes an Item from the data store """
-        logger.info("Deleting %s", self.wishlist_name)
+        logger.info("Deleting %s from %s", self.product_name, self.wishlist_id)
         db.session.delete(self)
         db.session.commit()
 
