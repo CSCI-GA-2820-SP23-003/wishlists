@@ -174,3 +174,95 @@ class TestItemsModel(unittest.TestCase):
         items_from_db_post_delete = Items.all()
         self.assertEqual(len(items_from_db_post_delete),0)
         
+
+    def test_update_no_id(self):
+        """It should not Update a item without an id"""
+        #Create a Wishlist and an Item
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        item = ItemsFactory()        
+        item.item_id = None
+        item.wishlist_id = wishlist.wishlist_id
+
+        #Try updating the Item
+        self.assertRaises(DataValidationError, item.update)
+
+
+    def test_list_all_items(self):
+        """Lists all Items in the Database"""
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        
+        #Create 5 items 
+        for _ in range(5):
+            item = ItemsFactory()
+            item.item_id=None
+            item.wishlist_id = wishlist.wishlist_id
+            item.create()
+
+        #Check if we have 5 items in the DB
+        items_from_db = Items.all()
+        self.assertEqual(len(items_from_db), 5)
+
+
+    def test_serialize_item(self):
+        """Tests Item serialization"""
+       
+        item = ItemsFactory()
+        serialized_data = item.serialize()                        
+
+        #Ensure data has contents.
+        self.assertNotEqual(serialized_data, None)
+
+        #Ensure item has item-id
+        self.assertIn("item_id", serialized_data)
+        self.assertEqual(serialized_data["item_id"], item.item_id)
+
+        #Ensure item has product_id
+        self.assertIn("product_id", serialized_data)
+        self.assertEqual(serialized_data["product_id"], item.product_id)
+        
+        #Ensure item has prouct name
+        self.assertIn("product_name", serialized_data)
+        self.assertEqual(serialized_data["product_name"], item.product_name)
+        
+        #Ensure item has wishlist_id
+        self.assertIn("wishlist_id", serialized_data)
+        self.assertEqual(serialized_data["wishlist_id"], item.wishlist_id)
+        
+        #Ensure item has quantity
+        self.assertIn("item_quantity", serialized_data)
+        self.assertEqual(serialized_data["item_quantity"], item.item_quantity)
+
+
+    def test_deserialize_item(self):
+        """Tests Item deserialisation"""
+        
+        #Create a wishlist, and an Item in the Wishlist.
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        item = ItemsFactory()
+        item.item_id=None
+        item.wishlist_id = wishlist.wishlist_id
+        
+        #data contains serialized dict
+        data = item.serialize()
+        
+        #Transfer dict info to items object
+        item = Items()
+        item.deserialize(data)
+
+        #Check if items object has valid data.
+        #1. Does it contain data
+        self.assertNotEqual(item, None)
+        self.assertEqual(item.item_id, None)
+
+        #2. Check if contents are correct.
+        self.assertEqual(data["wishlist_id"], item.wishlist_id)
+        self.assertEqual(data["product_name"], item.product_name)
+        self.assertEqual(data["product_id"], item.product_id)        
+        self.assertEqual(data["item_quantity"], item.item_quantity)
+        

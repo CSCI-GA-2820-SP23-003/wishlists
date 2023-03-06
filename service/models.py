@@ -210,22 +210,58 @@ class Items(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.product_name = data["product_name"]
+            
+            #1. Check product_id type.
             if isinstance(data["product_id"], int):
                 self.product_id = data["product_id"]
             else:
                 raise DataValidationError(
                     "Invalid type for integer [product_id]: "
                     + str(type(data["product_id"])))
+            
+            #2.  Check type for product name            
+            if isinstance(data["product_name"], str):
+                self.product_name = data["product_name"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for string [product_name]: "+ str(type(data["product_name"])))
+
+            #3. Check if a wishlist with that wishlist_id exists.
+            if isinstance(data["wishlist_id"], int):
+                target_wishlist = Wishlists.find(data["wishlist_id"])
+
+                #Wishlist does not exist
+                if not target_wishlist:
+                    raise DataValidationError(
+                        "Wishlist {0} doesn't exist!".format(data["wishlist_id"])
+                    )
+
+                self.wishlist_id = data["wishlist_id"]
+
+            else:
+                raise DataValidationError(
+                    "Invalid type for integer [wishlist_id]: " + str(type(data["wishlist_id"]))
+                )
+            
+            #4. Check that quantity is present and is not None           
+            if data.get("item_quantity", None):
+                if isinstance(data["item_quantity"], int):
+                    self.item_quantity = data["item_quantity"]
+                else:
+                    raise DataValidationError(
+                        "Invalid type for integer [item_quantity]: "+ str(type(data["item_quantity"]))
+                    )
+                    
+
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Wishlist: missing " + error.args[0]
             ) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Wishlist: body of request contained bad or no data - "
-                "Error message: " + str(error)
+                "Invalid Wishlist: body of request contained bad or no data - Error Message: "+ str(error)
             ) from error
+        
         return self
 
     ##################################################
