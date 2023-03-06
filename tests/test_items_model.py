@@ -112,10 +112,10 @@ class TestItemsModel(unittest.TestCase):
         #Create a wishlist and a specific product.
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
-        wishlist.create()          
+        wishlist.create()
         item = ItemsFactory()
         item.item_id, item.wishlist_id, item.product_id = None, wishlist.wishlist_id, 5                        
-        item.create()      
+        item.create()
         logging.debug(f"Original Item:{item}")  
 
         #Making sure item exists.
@@ -194,8 +194,8 @@ class TestItemsModel(unittest.TestCase):
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
         wishlist.create()
-        
-        #Create 5 items 
+
+        # Create 5 items 
         for _ in range(5):
             item = ItemsFactory()
             item.item_id=None
@@ -209,7 +209,7 @@ class TestItemsModel(unittest.TestCase):
 
     def test_serialize_item(self):
         """Tests Item serialization"""
-       
+
         item = ItemsFactory()
         serialized_data = item.serialize()                        
 
@@ -223,15 +223,15 @@ class TestItemsModel(unittest.TestCase):
         #Ensure item has product_id
         self.assertIn("product_id", serialized_data)
         self.assertEqual(serialized_data["product_id"], item.product_id)
-        
+
         #Ensure item has prouct name
         self.assertIn("product_name", serialized_data)
         self.assertEqual(serialized_data["product_name"], item.product_name)
-        
+
         #Ensure item has wishlist_id
         self.assertIn("wishlist_id", serialized_data)
         self.assertEqual(serialized_data["wishlist_id"], item.wishlist_id)
-        
+
         #Ensure item has quantity
         self.assertIn("item_quantity", serialized_data)
         self.assertEqual(serialized_data["item_quantity"], item.item_quantity)
@@ -239,7 +239,7 @@ class TestItemsModel(unittest.TestCase):
 
     def test_deserialize_item(self):
         """Tests Item deserialisation"""
-        
+
         #Create a wishlist, and an Item in the Wishlist.
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
@@ -247,10 +247,10 @@ class TestItemsModel(unittest.TestCase):
         item = ItemsFactory()
         item.item_id=None
         item.wishlist_id = wishlist.wishlist_id
-        
+
         #data contains serialized dict
         data = item.serialize()
-        
+
         #Transfer dict info to items object
         item = Items()
         item.deserialize(data)
@@ -265,4 +265,159 @@ class TestItemsModel(unittest.TestCase):
         self.assertEqual(data["product_name"], item.product_name)
         self.assertEqual(data["product_id"], item.product_id)        
         self.assertEqual(data["item_quantity"], item.item_quantity)
-        
+
+    def test_deserialize_missing_data(self):
+        """It should not deserialize a item with missing data"""
+
+        # Create dict without product ID
+        data = {"item_id": 1, "product_name": "item-1"}
+        item = Items()
+        self.assertRaises(DataValidationError, item.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+
+        # Create a string variable and try to deserialize it
+        data = "this is not a dictionary"
+        item = Items()
+        self.assertRaises(DataValidationError, item.deserialize, data)
+
+    def test_deserialize_bad_wishlist_id(self):
+        """It should not deserialize a bad customer_id attribute"""
+
+        # Create an Item in the Wishlist.
+        test_item = ItemsFactory()
+
+        # Serialize the item and put wishlist ID as string
+        data = test_item.serialize()
+        data["wishlist_id"] = "1"
+        item = Items()
+        self.assertRaises(DataValidationError, item.deserialize, data)
+
+    def test_deserialize_bad_product_id(self):
+        """It should not deserialize a bad customer_id attribute"""
+
+        # Create a wishlist, and an Item in the Wishlist.
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        test_item = ItemsFactory()
+
+        # Serialize the item and put product id as string
+        data = test_item.serialize()
+        data["product_id"] = "1"
+        item = Items()
+        self.assertRaises(DataValidationError, item.deserialize, data)
+
+    def test_deserialize_bad_item_quantity(self):
+        """It should not deserialize a bad customer_id attribute"""
+
+        # Create a wishlist, and an Item in the Wishlist.
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        test_item = ItemsFactory()
+
+        # Serialize the item and put item_quantity as string
+        data = test_item.serialize()
+        data["item_quantity"] = "1"
+        item = Items()
+
+        # Check if correct Error is raised
+        self.assertRaises(DataValidationError, item.deserialize, data)
+
+    def test_find_item(self):
+        """It should Find an item by ID"""
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+
+        # Add 5 Items in a wishlist
+        items = ItemsFactory.create_batch(5)
+        for item in items:
+            item.wishlist_id = wishlist.wishlist_id
+            item.create()
+        logging.debug(items)
+
+        # Make sure they got saved
+        self.assertEqual(len(Items.all()), 5)
+
+        # Find the 2nd item in the list and compare its attributes
+        item = Items.find(items[1].item_id)
+        self.assertIsNot(item, None)
+        self.assertEqual(item.item_id, items[1].item_id)
+        self.assertEqual(item.product_name, items[1].product_name)
+        self.assertEqual(items[1].product_id, item.product_id)
+        self.assertEqual(items[1].wishlist_id, item.wishlist_id)
+        self.assertEqual(items[1].item_quantity, item.item_quantity)
+
+    def test_find_by_wishlist_id(self):
+        """It should Find items by wishlist id"""
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+
+        # Add 10 Items in a wishlist
+        items = ItemsFactory.create_batch(10)
+        for item in items:
+            item.wishlist_id = wishlist.wishlist_id
+            item.create()
+
+        # Select a wishlist_id to search for
+        wishlist_id = items[0].wishlist_id
+
+        # Count the number of items in that selected wishlist
+        count = len([item for item in items if item.wishlist_id == wishlist_id])
+
+        # Filter the items from the database with specific wishlist_id
+        found = Items.find_by_wishlist_id(wishlist_id)
+
+        # Compare if both counts match
+        self.assertEqual(found.count(), count)
+        for item in found:
+            self.assertEqual(item.wishlist_id, wishlist_id)
+
+    def test_find_by_name(self):
+        """It should Find an item by Name"""
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+
+        # Add 5 Items in a wishlist
+        items = ItemsFactory.create_batch(5)
+        for item in items:
+            item.wishlist_id = wishlist.wishlist_id
+            item.create()
+
+        # Select a product name to search for
+        name = items[0].product_name
+
+        # Search for an item by "name" product_name
+        found = Items.find_by_name(name)
+        self.assertEqual(found.count(), 1)
+        self.assertEqual(found[0].wishlist_id, items[0].wishlist_id)
+        self.assertEqual(items[0].product_id, found[0].product_id)
+        self.assertEqual(items[0].wishlist_id, found[0].wishlist_id)
+        self.assertEqual(items[0].item_quantity, found[0].item_quantity)
+
+    def test_find_or_404_found(self):
+        """It should Find or return 404 not found"""
+        wishlist = WishlistsFactory()
+        wishlist.wishlist_id = None
+        wishlist.create()
+        items = ItemsFactory.create_batch(3)
+        for item in items:
+            item.wishlist_id = wishlist.wishlist_id
+            item.create()
+
+        item = Items.find_or_404(items[1].item_id)
+        self.assertIsNot(item, None)
+        self.assertEqual(item.item_id, items[1].item_id)
+        self.assertEqual(item.product_name, items[1].product_name)
+        self.assertEqual(items[1].product_id, item.product_id)
+        self.assertEqual(items[1].wishlist_id, item.wishlist_id)
+        self.assertEqual(items[1].item_quantity, item.item_quantity)
+
+    def test_find_or_404_not_found(self):
+        """It should return 404 not found"""
+        self.assertRaises(NotFound, Items.find_or_404, 0)
