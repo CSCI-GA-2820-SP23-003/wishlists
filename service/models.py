@@ -22,9 +22,9 @@ class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
 
-class YourResourceModel(db.Model):
+class Wishlist(db.Model):
     """
-    Class that represents a YourResourceModel
+    Class that represents a Wishlist
     """
 
     app = None
