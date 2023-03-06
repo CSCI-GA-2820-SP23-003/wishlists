@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for Wishlist
 
 All of the models are stored in this module
 """
@@ -15,7 +15,7 @@ db = SQLAlchemy()
 # Function to initialize the database
 def init_db(app):
     """ Initializes the SQLAlchemy app """
-    YourResourceModel.init_db(app)
+    Wishlist.init_db(app)
 
 
 class DataValidationError(Exception):
@@ -34,11 +34,11 @@ class Wishlist(db.Model):
     name = db.Column(db.String(63))
 
     def __repr__(self):
-        return f"<YourResourceModel {self.name} id=[{self.id}]>"
+        return f"<Wishlist {self.name} id=[{self.id}]>"
 
     def create(self):
         """
-        Creates a YourResourceModel to the database
+        Creates a Wishlist to the database
         """
         logger.info("Creating %s", self.name)
         self.id = None  # pylint: disable=invalid-name
@@ -47,24 +47,24 @@ class Wishlist(db.Model):
 
     def update(self):
         """
-        Updates a YourResourceModel to the database
+        Updates a Wishlist to the database
         """
         logger.info("Saving %s", self.name)
         db.session.commit()
 
     def delete(self):
-        """ Removes a YourResourceModel from the data store """
+        """ Removes a Wishlist from the data store """
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
-        """ Serializes a YourResourceModel into a dictionary """
+        """ Serializes a Wishlist into a dictionary """
         return {"id": self.id, "name": self.name}
 
     def deserialize(self, data):
         """
-        Deserializes a YourResourceModel from a dictionary
+        Deserializes a Wishlist from a dictionary
 
         Args:
             data (dict): A dictionary containing the resource data
@@ -73,11 +73,11 @@ class Wishlist(db.Model):
             self.name = data["name"]
         except KeyError as error:
             raise DataValidationError(
-                "Invalid YourResourceModel: missing " + error.args[0]
+                "Invalid Wishlist: missing " + error.args[0]
             ) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid YourResourceModel: body of request contained bad or no data - "
+                "Invalid Wishlist: body of request contained bad or no data - "
                 "Error message: " + error
             ) from error
         return self
@@ -94,22 +94,22 @@ class Wishlist(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the YourResourceModels in the database """
-        logger.info("Processing all YourResourceModels")
+        """ Returns all of the Wishlist in the database """
+        logger.info("Processing all Wishlist")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """ Finds a YourResourceModel by it's ID """
+        """ Finds a Wishlist by it's ID """
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all YourResourceModels with the given name
+        """Returns all Wishlist with the given name
 
         Args:
-            name (string): the name of the YourResourceModels you want to match
+            name (string): the name of the Wishlist you want to match
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
