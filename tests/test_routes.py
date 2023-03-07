@@ -94,7 +94,7 @@ class TestWishlistService(TestCase):
         data = response.get_json()
         self.assertIn("was not found", data["message"])
 
-    def test_rename_wishlist(self):
+    def test_update_wishlist(self):
         """It should rename the wishlist."""
         test_wishlist = WishlistsFactory()
         response = self.app.post(BASE_URL, json=test_wishlist.serialize())
