@@ -16,8 +16,8 @@ class WishlistsFactory(factory.Factory):
 
         model = Wishlist
 
-    wishlist_id = factory.Sequence(lambda n: n)
-    wishlist_name = factory.Faker("name")
+    id = factory.Sequence(lambda n: n)
+    name = factory.Faker("name")
     owner_id = FuzzyChoice(choices=[1, 2, 3])
     created_at = FuzzyDateTime(datetime.datetime(2008, 1, 1, tzinfo=datetime.timezone.utc))
 
@@ -30,7 +30,7 @@ class ItemsFactory(factory.Factory):
 
         model = Item
 
-    item_id = factory.Sequence(lambda n: n)
+    id = factory.Sequence(lambda n: n)
     wishlist_id = 1
     product_id = FuzzyChoice(choices=[1, 2, 3])
     item_quantity = FuzzyChoice(choices=[1, 2, 3])
