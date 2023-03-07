@@ -78,6 +78,14 @@ class TestWishlistService(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_list_wishlists(self):
+        """ It should list all wishlists"""
+        self.__create_wishlists(10)
+        response = self.app.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 10)
+
     def test_get_wishlist(self):
         """It should Read a single Wishlist"""
         # get the id of a order

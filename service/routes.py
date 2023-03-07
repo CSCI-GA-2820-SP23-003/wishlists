@@ -59,6 +59,18 @@ def get_wishlists(wishlist_id):
     app.logger.info("Returning Wishlist: %s", wishlist.name)
     return jsonify(wishlist.serialize()), status.HTTP_200_OK
 
+# LIST wishlist
+@app.route("/wishlists", methods=["GET"])
+def list_wishlists():
+    """
+    List all the wishlists
+    """    
+    app.logger.info("Request for listing all the wishlists")
+    wishlists = Wishlist.all()
+    results = [wishlist.serialize() for wishlist in wishlists]
+    app.logger.info("Returning %d wishlists", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
 
 # Add Wishlist
 @app.route("/wishlists", methods=["POST"])
