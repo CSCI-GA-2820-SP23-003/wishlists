@@ -32,7 +32,7 @@ class TestItemsModel(unittest.TestCase):
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)        
+        app.logger.setLevel(logging.CRITICAL)
 
     @classmethod
     def tearDownClass(cls):
@@ -75,10 +75,8 @@ class TestItemsModel(unittest.TestCase):
         wishlist.id = None
         wishlist.create()
         # Create an item, and link it to the wishlist created above.
-        item = Item(product_name="first item",
-                     product_id=3,
-                     wishlist_id=wishlist.id,
-                     item_quantity=1)
+        item = Item(product_name="first item", product_id=3, wishlist_id=wishlist.id,
+                    item_quantity=1)
         self.assertTrue(item is not None)
         self.assertEqual(item.id, None)
         item.create()

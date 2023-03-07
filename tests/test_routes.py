@@ -10,7 +10,7 @@ import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import app
-from service.models import db, init_db, Item, Wishlist
+from service.models import db, Item, Wishlist
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistsFactory, ItemsFactory
 
@@ -25,6 +25,8 @@ BASE_URL = "/wishlists"
 ######################################################################
 #  T E S T   WISHLIST   S E R V I C E
 ######################################################################
+
+
 class TestWishlistService(TestCase):
     """ REST API Server Tests """
 
