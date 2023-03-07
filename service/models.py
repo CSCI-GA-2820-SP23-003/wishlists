@@ -33,7 +33,7 @@ class Wishlist(db.Model):
     app = None
 
     # Table Schema
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(63), nullable=False)
     owner_id = db.Column(db.Integer, nullable=False)
@@ -42,7 +42,7 @@ class Wishlist(db.Model):
 
     def __repr__(self):
         return f"<Wishlist {self.name} id=[{self.id}]>"
-    
+
     def create(self):
         """
         Creates a Wishlist to the database
@@ -160,7 +160,7 @@ class Item(db.Model):
     app = None
 
     # Table Schema
-    
+
     id = db.Column(db.Integer, primary_key=True)
     wishlist_id = db.Column(
         db.Integer, db.ForeignKey("wishlist.id", ondelete="CASCADE"), nullable=False)
