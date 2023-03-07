@@ -104,3 +104,20 @@ class TestItemService(TestCase):
         """ It should call the home page """
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_rename_wishlist(self):
+        """It should rename the wishlist."""
+        test_wishlist = WishlistsFactory()
+        test_wishlist.create()
+        response = self.app.put(
+            f"{BASE_URL}/{test_wishlist.id}", json={"name": "Test Rename"}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        renamed_wishlist = response.get_json()
+        self.assertEqual(renamed_wishlist["name"], "Test Rename")
+
+    def test_update_wishlist_not_found(self):
+        """It should not Update a Wishlist who doesn't exist"""
+        response = self.app.put(f"{BASE_URL}/0", json={})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
