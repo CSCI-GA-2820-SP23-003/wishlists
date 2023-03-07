@@ -84,13 +84,13 @@ def create_wishlist():
 @app.route("/wishlists/<int:wishlist_id>/items", methods=["POST"])
 def create_item(wishlist_id):
     """
-    Create an item on an order
-    This endpoint will add an item to an order
+    Create an item on a wishlist
+    This endpoint will add an item to a wishlist
     """
-    app.logger.info("Request to create an Item for Order with id: %s", wishlist_id)
+    app.logger.info("Request to create an Item for Wishlist with id: %s", wishlist_id)
     check_content_type("application/json")
 
-    # See if the order exists and abort if it doesn't
+    # See if the wishlist exists and abort if it doesn't
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
         abort(
@@ -102,7 +102,7 @@ def create_item(wishlist_id):
     item = Item()
     item.deserialize(request.get_json())
 
-    # Append the item to the order
+    # Append the item to the wishlist
     wishlist.wishlist_items.append(item)
     wishlist.update()
 
