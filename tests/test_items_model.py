@@ -54,7 +54,7 @@ class TestItemsModel(unittest.TestCase):
     ######################################################################
 
     def test_create_item(self):
-        """Creates an Item and asserts that it exist."""
+        """Creates an Item and asserts that it exists."""
         item = Item(product_name="first item", wishlist_id=1, item_quantity=1)
         self.assertEqual(str(item), "<Item first item id=[None]>")
         self.assertTrue(item is not None)
