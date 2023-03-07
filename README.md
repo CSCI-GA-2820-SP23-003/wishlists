@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
+Wishlist Service
 
 ## Overview
 
@@ -54,6 +54,18 @@ tests/              - test cases package
 ├── test_models.py  - test suite for business models
 └── test_routes.py  - test suite for service routes
 ```
+
+## APIs
+
+# List all the wishlists
+
+Endpoint : /wishlists
+
+Method : GET
+
+Example: GET /wishlists
+
+Success Status : 200 OK
 
 ## License
 
