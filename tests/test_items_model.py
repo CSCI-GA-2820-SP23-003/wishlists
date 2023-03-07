@@ -10,7 +10,7 @@ import os
 import logging
 import unittest
 from werkzeug.exceptions import NotFound
-from service.models import Wishlists, Items, DataValidationError, db
+from service.models import Wishlist, Item, DataValidationError, db
 from service import app
 from tests.factories import ItemsFactory, WishlistsFactory
 
@@ -32,9 +32,7 @@ class TestItemsModel(unittest.TestCase):
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)
-        Items.init_db(app)
-        Wishlists.init_db(app)
+        app.logger.setLevel(logging.CRITICAL)        
 
     @classmethod
     def tearDownClass(cls):
@@ -43,8 +41,8 @@ class TestItemsModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(Items).delete()  # clean up the last tests
-        db.session.query(Wishlists).delete()  # clean up the wishlists
+        db.session.query(Item).delete()  # clean up the last tests
+        db.session.query(Wishlist).delete()  # clean up the wishlists
         db.session.commit()
 
     def tearDown(self):
@@ -57,7 +55,7 @@ class TestItemsModel(unittest.TestCase):
 
     def test_create_item(self):
         """Creates an Item and asserts that it exists."""
-        item = Items(product_name="first item", wishlist_id=1, item_quantity=1)
+        item = Item(product_name="first item", wishlist_id=1, item_quantity=1)
         self.assertEqual(str(item), "<Item first item id=[None]>")
         self.assertTrue(item is not None)
         self.assertEqual(item.item_id, None)
@@ -68,16 +66,16 @@ class TestItemsModel(unittest.TestCase):
     def test_add_item(self):
         """Creates an Item and adds it to the database."""
 
-        wish = Wishlists.all()
+        wish = Wishlist.all()
         self.assertEqual(wish, [])
-        items = Items.all()
+        items = Item.all()
         self.assertEqual(items, [])
         # Create a wishlist.
         wishlist = WishlistsFactory()
         wishlist.wishlist_id = None
         wishlist.create()
         # Create an item, and link it to the wishlist created above.
-        item = Items(product_name="first item",
+        item = Item(product_name="first item",
                      product_id=3,
                      wishlist_id=wishlist.wishlist_id,
                      item_quantity=1)
@@ -86,7 +84,7 @@ class TestItemsModel(unittest.TestCase):
         item.create()
         # Check that its assigned an id, and is present in our database.
         self.assertIsNotNone(item.item_id)
-        items = Items.all()
+        items = Item.all()
         self.assertEqual(len(items), 1)
 
     def test_read_item(self):
@@ -102,7 +100,7 @@ class TestItemsModel(unittest.TestCase):
         self.assertIsNotNone(item.item_id)
 
         # Read created item from the database, and verify that it has correct fields.
-        fetch_item = Items.find(item.item_id)
+        fetch_item = Item.find(item.item_id)
         self.assertEqual(fetch_item.item_id, item.item_id)
         self.assertEqual(fetch_item.product_name, item.product_name)
         self.assertEqual(fetch_item.wishlist_id, item.wishlist_id)
@@ -145,7 +143,7 @@ class TestItemsModel(unittest.TestCase):
         self.assertEqual(item.item_quantity, original_item_quantity+10)
 
         # 3. Fetch once more from DB and ensure fields are modified
-        items_from_db = Items.all()
+        items_from_db = Item.all()
         self.assertEqual(len(items_from_db), 1)
         test_item = items_from_db[0]
         self.assertEqual(test_item.product_id, original_product_id+10)
@@ -166,14 +164,14 @@ class TestItemsModel(unittest.TestCase):
         self.assertIsNotNone(item.item_id)
 
         # Ensure there is one item in the database.
-        items_from_db = Items.all()
+        items_from_db = Item.all()
         self.assertEqual(len(items_from_db), 1)
 
         # Delete the item
         item.delete()
 
         # Fetch items again and ensure there are no items.
-        items_from_db_post_delete = Items.all()
+        items_from_db_post_delete = Item.all()
         self.assertEqual(len(items_from_db_post_delete), 0)
 
     def test_update_no_id(self):
@@ -203,7 +201,7 @@ class TestItemsModel(unittest.TestCase):
             item.create()
 
         # Check if we have 5 items in the DB
-        items_from_db = Items.all()
+        items_from_db = Item.all()
         self.assertEqual(len(items_from_db), 5)
 
     def test_serialize_item(self):
@@ -250,7 +248,7 @@ class TestItemsModel(unittest.TestCase):
         data = item.serialize()
 
         # Transfer dict info to items object
-        item = Items()
+        item = Item()
         item.deserialize(data)
 
         # Check if items object has valid data.
@@ -269,7 +267,7 @@ class TestItemsModel(unittest.TestCase):
 
         # Create dict without product ID
         data = {"item_id": 1, "product_name": "item-1"}
-        item = Items()
+        item = Item()
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_data(self):
@@ -277,7 +275,7 @@ class TestItemsModel(unittest.TestCase):
 
         # Create a string variable and try to deserialize it
         data = "this is not a dictionary"
-        item = Items()
+        item = Item()
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_wishlist_id(self):
@@ -289,7 +287,7 @@ class TestItemsModel(unittest.TestCase):
         # Serialize the item and put wishlist ID as string
         data = test_item.serialize()
         data["wishlist_id"] = "1"
-        item = Items()
+        item = Item()
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_product_id(self):
@@ -304,7 +302,7 @@ class TestItemsModel(unittest.TestCase):
         # Serialize the item and put product id as string
         data = test_item.serialize()
         data["product_id"] = "1"
-        item = Items()
+        item = Item()
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_item_quantity(self):
@@ -319,7 +317,7 @@ class TestItemsModel(unittest.TestCase):
         # Serialize the item and put item_quantity as string
         data = test_item.serialize()
         data["item_quantity"] = "1"
-        item = Items()
+        item = Item()
 
         # Check if correct Error is raised
         self.assertRaises(DataValidationError, item.deserialize, data)
@@ -338,10 +336,10 @@ class TestItemsModel(unittest.TestCase):
         logging.debug(items)
 
         # Make sure they got saved
-        self.assertEqual(len(Items.all()), 5)
+        self.assertEqual(len(Item.all()), 5)
 
         # Find the 2nd item in the list and compare its attributes
-        item = Items.find(items[1].item_id)
+        item = Item.find(items[1].item_id)
         self.assertIsNot(item, None)
         self.assertEqual(item.item_id, items[1].item_id)
         self.assertEqual(item.product_name, items[1].product_name)
@@ -368,7 +366,7 @@ class TestItemsModel(unittest.TestCase):
         count = len([item for item in items if item.wishlist_id == wishlist_id])
 
         # Filter the items from the database with specific wishlist_id
-        found = Items.find_by_wishlist_id(wishlist_id)
+        found = Item.find_by_wishlist_id(wishlist_id)
 
         # Compare if both counts match
         self.assertEqual(found.count(), count)
@@ -391,7 +389,7 @@ class TestItemsModel(unittest.TestCase):
         name = items[0].product_name
 
         # Search for an item by "name" product_name
-        found = Items.find_by_name(name)
+        found = Item.find_by_name(name)
         self.assertEqual(found.count(), 1)
         self.assertEqual(found[0].wishlist_id, items[0].wishlist_id)
         self.assertEqual(items[0].product_id, found[0].product_id)
@@ -408,7 +406,7 @@ class TestItemsModel(unittest.TestCase):
             item.wishlist_id = wishlist.wishlist_id
             item.create()
 
-        item = Items.find_or_404(items[1].item_id)
+        item = Item.find_or_404(items[1].item_id)
         self.assertIsNot(item, None)
         self.assertEqual(item.item_id, items[1].item_id)
         self.assertEqual(item.product_name, items[1].product_name)
@@ -418,4 +416,4 @@ class TestItemsModel(unittest.TestCase):
 
     def test_find_or_404_not_found(self):
         """It should return 404 not found"""
-        self.assertRaises(NotFound, Items.find_or_404, 0)
+        self.assertRaises(NotFound, Item.find_or_404, 0)

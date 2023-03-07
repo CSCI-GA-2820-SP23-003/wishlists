@@ -1,5 +1,5 @@
 """
-Models for Wishlists and Items
+Models for Wishlist and Item
 
 All of the models are stored in this module
 """
@@ -17,15 +17,15 @@ db = SQLAlchemy()
 # Function to initialize the database
 def init_db(app):
     """ Initializes the SQLAlchemy app """
-    Wishlists.init_db(app)
-    Items.init_db(app)
+    Wishlist.init_db(app)
+    Item.init_db(app)
 
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
 
-class Wishlists(db.Model):
+class Wishlist(db.Model):
     """
     Class that represents a Wishlist
     """
@@ -37,7 +37,7 @@ class Wishlists(db.Model):
     wishlist_name = db.Column(db.String(63), nullable=False)
     owner_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
-    wishlist_items = db.relationship("Items", backref="wishlists", cascade="all, delete", lazy=True)
+    wishlist_items = db.relationship("Item", backref="wishlist", cascade="all, delete", lazy=True)
 
     def __repr__(self):
         return f"<Wishlist {self.wishlist_name} id=[{self.wishlist_id}]>"
@@ -106,7 +106,7 @@ class Wishlists(db.Model):
     @classmethod
     def init_db(cls, app: Flask):
         """ Initializes the database session """
-        logger.info("Initializing Wishlists database")
+        logger.info("Initializing Wishlist database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
@@ -115,8 +115,8 @@ class Wishlists(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the Wishlists in the database """
-        logger.info("Processing all Wishlists")
+        """ Returns all of the Wishlist in the database """
+        logger.info("Processing all Wishlist")
         return cls.query.all()
 
     @classmethod
@@ -127,19 +127,19 @@ class Wishlists(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all Wishlists with the given name
+        """Returns all Wishlist with the given name
 
         Args:
-            name (string): the name of the Wishlists you want to match
+            name (string): the name of the Wishlist you want to match
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.wishlist_name == name)
 
     @classmethod
     def find_by_owner_id(cls, owner_id):
-        """Returns all wishlists with the given owner id
+        """Returns all wishlist with the given owner id
         Args:
-            name (string): the name of the WishlistsModels you want to match
+            name (string): the name of the WishlistModels you want to match
         """
         logger.info("Processing owner id query for %s ...", str(owner_id))
         return cls.query.filter(cls.owner_id == owner_id)
@@ -151,9 +151,9 @@ class Wishlists(db.Model):
         return cls.query.get_or_404(wishlist_id)
 
 
-class Items(db.Model):
+class Item(db.Model):
     """
-    Class that represents a Items
+    Class that represents a Item
     """
 
     app = None
@@ -161,7 +161,7 @@ class Items(db.Model):
     # Table Schema
     item_id = db.Column(db.Integer, primary_key=True)
     wishlist_id = db.Column(
-        db.Integer, db.ForeignKey("wishlists.wishlist_id", ondelete="CASCADE"), nullable=False)
+        db.Integer, db.ForeignKey("wishlist.wishlist_id", ondelete="CASCADE"), nullable=False)
     product_id = db.Column(db.Integer, nullable=False)
     item_quantity = db.Column(db.Integer, nullable=False, default=1)
     product_name = db.Column(db.String(63), nullable=False)
@@ -226,7 +226,7 @@ class Items(db.Model):
 
             # 3. Check if a wishlist with that wishlist_id exists.
             if isinstance(data["wishlist_id"], int):
-                target_wishlist = Wishlists.find(data["wishlist_id"])
+                target_wishlist = Wishlist.find(data["wishlist_id"])
 
                 # Wishlist does not exist
                 if not target_wishlist:
@@ -268,7 +268,7 @@ class Items(db.Model):
     @classmethod
     def init_db(cls, app: Flask):
         """ Initializes the database session """
-        logger.info("Initializing Items database")
+        logger.info("Initializing Item database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
@@ -277,8 +277,8 @@ class Items(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the Items in the database """
-        logger.info("Processing all wishlist Items")
+        """ Returns all of the Item in the database """
+        logger.info("Processing all wishlist Item")
         return cls.query.all()
 
     @classmethod
@@ -289,19 +289,19 @@ class Items(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all Items with the given name
+        """Returns all Item with the given name
 
         Args:
-            name (string): the name of the Wishlists you want to match
+            name (string): the name of the Wishlist you want to match
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.product_name == name)
 
     @classmethod
     def find_by_wishlist_id(cls, wishlist_id):
-        """Returns all Items with the given owner id
+        """Returns all Item with the given owner id
         Args:
-            name (string): the name of the WishlistsModels you want to match
+            name (string): the name of the WishlistModels you want to match
         """
         logger.info("Processing owner id query for %s ...", str(wishlist_id))
         return cls.query.filter(cls.wishlist_id == wishlist_id)

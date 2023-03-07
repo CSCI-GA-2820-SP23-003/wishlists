@@ -5,7 +5,7 @@ import datetime
 
 import factory
 from factory.fuzzy import FuzzyChoice, FuzzyDateTime
-from service.models import Wishlists, Items
+from service.models import Wishlist, Item
 
 
 class WishlistsFactory(factory.Factory):
@@ -14,7 +14,7 @@ class WishlistsFactory(factory.Factory):
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
 
-        model = Wishlists
+        model = Wishlist
 
     wishlist_id = factory.Sequence(lambda n: n)
     wishlist_name = factory.Faker("name")
@@ -28,7 +28,7 @@ class ItemsFactory(factory.Factory):
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
 
-        model = Items
+        model = Item
 
     item_id = factory.Sequence(lambda n: n)
     wishlist_id = 1

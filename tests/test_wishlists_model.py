@@ -14,7 +14,7 @@ import logging
 import unittest
 import datetime
 from werkzeug.exceptions import NotFound
-from service.models import Wishlists, DataValidationError, db
+from service.models import Wishlist, DataValidationError, db
 from service import app
 from tests.factories import WishlistsFactory
 
@@ -36,8 +36,7 @@ class TestWishlistsModel(unittest.TestCase):
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)
-        Wishlists.init_db(app)
+        app.logger.setLevel(logging.CRITICAL)        
 
     @classmethod
     def tearDownClass(cls):
@@ -46,7 +45,7 @@ class TestWishlistsModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(Wishlists).delete()  # clean up the last tests
+        db.session.query(Wishlist).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -60,7 +59,7 @@ class TestWishlistsModel(unittest.TestCase):
     def test_create_a_wishlist(self):
         """It should Create a wishlist and assert that it exists"""
         create_time = datetime.datetime.now()
-        wishlist = Wishlists(wishlist_name="first wishlist", owner_id=1, created_at=create_time)
+        wishlist = Wishlist(wishlist_name="first wishlist", owner_id=1, created_at=create_time)
         self.assertEqual(str(wishlist), "<Wishlist first wishlist id=[None]>")
         self.assertTrue(wishlist is not None)
         self.assertEqual(wishlist.wishlist_id, None)
@@ -70,16 +69,16 @@ class TestWishlistsModel(unittest.TestCase):
 
     def test_add_a_wishlist(self):
         """It should Create a wishlist and add it to the database"""
-        wishlists = Wishlists.all()
+        wishlists = Wishlist.all()
         self.assertEqual(wishlists, [])
         current_time = datetime.datetime.now()
-        wishlist = Wishlists(wishlist_name="first wishlist", owner_id=1, created_at=current_time)
+        wishlist = Wishlist(wishlist_name="first wishlist", owner_id=1, created_at=current_time)
         self.assertTrue(wishlist is not None)
         self.assertEqual(wishlist.wishlist_id, None)
         wishlist.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(wishlist.wishlist_id)
-        wishlists = Wishlists.all()
+        wishlists = Wishlist.all()
         # logging.info(wishlist.wishlist_id)
         self.assertEqual(len(wishlists), 1)
 
@@ -91,7 +90,7 @@ class TestWishlistsModel(unittest.TestCase):
         wishlist.create()
         self.assertIsNotNone(wishlist.wishlist_id)
         # Fetch it back
-        found_wishlist = Wishlists.find(wishlist.wishlist_id)
+        found_wishlist = Wishlist.find(wishlist.wishlist_id)
         self.assertEqual(found_wishlist.wishlist_id, wishlist.wishlist_id)
         self.assertEqual(found_wishlist.wishlist_name, wishlist.wishlist_name)
         self.assertEqual(found_wishlist.owner_id, wishlist.owner_id)
@@ -113,7 +112,7 @@ class TestWishlistsModel(unittest.TestCase):
         self.assertEqual(wishlist.owner_id, 2)
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
-        wishlists = Wishlists.all()
+        wishlists = Wishlist.all()
         self.assertEqual(len(wishlists), 1)
         self.assertEqual(wishlists[0].wishlist_id, original_id)
         self.assertEqual(wishlists[0].owner_id, 2)
@@ -129,21 +128,21 @@ class TestWishlistsModel(unittest.TestCase):
         """It should Delete a wishlist"""
         wishlist = WishlistsFactory()
         wishlist.create()
-        self.assertEqual(len(Wishlists.all()), 1)
+        self.assertEqual(len(Wishlist.all()), 1)
         # delete the wishlist and make sure it isn't in the database
         wishlist.delete()
-        self.assertEqual(len(Wishlists.all()), 0)
+        self.assertEqual(len(Wishlist.all()), 0)
 
     def test_list_all_wishlists(self):
         """It should List all wishlists in the database"""
-        wishlists = Wishlists.all()
+        wishlists = Wishlist.all()
         self.assertEqual(wishlists, [])
         # Create 5 wishlists
         for _ in range(5):
             wishlist = WishlistsFactory()
             wishlist.create()
         # See if we get back 5 wishlists
-        wishlists = Wishlists.all()
+        wishlists = Wishlist.all()
         self.assertEqual(len(wishlists), 5)
 
     def test_serialize_a_wishlist(self):
@@ -163,7 +162,7 @@ class TestWishlistsModel(unittest.TestCase):
     def test_deserialize_a_wishlist(self):
         """It should de-serialize a wishlist"""
         data = WishlistsFactory().serialize()
-        wishlist = Wishlists()
+        wishlist = Wishlist()
         wishlist.deserialize(data)
         self.assertNotEqual(wishlist, None)
         self.assertEqual(wishlist.wishlist_id, None)
@@ -173,13 +172,13 @@ class TestWishlistsModel(unittest.TestCase):
     def test_deserialize_missing_data(self):
         """It should not deserialize a wishlist with missing data"""
         data = {"wishlist_id": 1, "wishlist_name": "Kitty"}
-        wishlist = Wishlists()
+        wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, data)
 
     def test_deserialize_bad_data(self):
         """It should not deserialize bad data"""
         data = "this is not a dictionary"
-        wishlist = Wishlists()
+        wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, data)
 
     def test_deserialize_bad_owner_id(self):
@@ -187,7 +186,7 @@ class TestWishlistsModel(unittest.TestCase):
         test_wishlist = WishlistsFactory()
         data = test_wishlist.serialize()
         data["owner_id"] = "1"
-        wishlist = Wishlists()
+        wishlist = Wishlist()
         self.assertRaises(DataValidationError, wishlist.deserialize, data)
 
     def test_find_wishlist(self):
@@ -197,9 +196,9 @@ class TestWishlistsModel(unittest.TestCase):
             wishlist.create()
         logging.debug(wishlists)
         # make sure they got saved
-        self.assertEqual(len(Wishlists.all()), 5)
+        self.assertEqual(len(Wishlist.all()), 5)
         # find the 2nd wishlist in the list
-        wishlist = Wishlists.find(wishlists[1].wishlist_id)
+        wishlist = Wishlist.find(wishlists[1].wishlist_id)
         self.assertIsNot(wishlist, None)
         self.assertEqual(wishlist.wishlist_id, wishlists[1].wishlist_id)
         self.assertEqual(wishlist.wishlist_name, wishlists[1].wishlist_name)
@@ -213,7 +212,7 @@ class TestWishlistsModel(unittest.TestCase):
             wishlist.create()
         owner_id = wishlists[0].owner_id
         count = len([wishlist for wishlist in wishlists if wishlist.owner_id == owner_id])
-        found = Wishlists.find_by_owner_id(owner_id)
+        found = Wishlist.find_by_owner_id(owner_id)
         self.assertEqual(found.count(), count)
         for wishlist in found:
             self.assertEqual(wishlist.owner_id, owner_id)
@@ -224,7 +223,7 @@ class TestWishlistsModel(unittest.TestCase):
         for wishlist in wishlists:
             wishlist.create()
         name = wishlists[0].wishlist_name
-        found = Wishlists.find_by_name(name)
+        found = Wishlist.find_by_name(name)
         self.assertEqual(found.count(), 1)
         self.assertEqual(found[0].owner_id, wishlists[0].owner_id)
         self.assertEqual(found[0].created_at, wishlists[0].created_at)
@@ -235,7 +234,7 @@ class TestWishlistsModel(unittest.TestCase):
         for wishlist in wishlists:
             wishlist.create()
 
-        wishlist = Wishlists.find_or_404(wishlists[1].wishlist_id)
+        wishlist = Wishlist.find_or_404(wishlists[1].wishlist_id)
         self.assertIsNot(wishlist, None)
         self.assertEqual(wishlist.wishlist_id, wishlists[1].wishlist_id)
         self.assertEqual(wishlist.wishlist_name, wishlists[1].wishlist_name)
@@ -244,4 +243,4 @@ class TestWishlistsModel(unittest.TestCase):
 
     def test_find_or_404_not_found(self):
         """It should return 404 not found"""
-        self.assertRaises(NotFound, Wishlists.find_or_404, 0)
+        self.assertRaises(NotFound, Wishlist.find_or_404, 0)
