@@ -138,16 +138,23 @@ class TestItemService(TestCase):
     def test_rename_wishlist(self):
         """It should rename the wishlist."""
         test_wishlist = WishlistsFactory()
-        test_wishlist.create()
+        response = self.app.post(BASE_URL, json=test_wishlist.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_wishlist = response.get_json()
+        new_wishlist["name"] = "new name"
+        new_wishlist["owner_id"] = 5
         response = self.app.put(
-            f"{BASE_URL}/{test_wishlist.id}", json={"name": "Test Rename"}
+            f"{BASE_URL}/{new_wishlist['id']}", json=new_wishlist
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        renamed_wishlist = response.get_json()
-        self.assertEqual(renamed_wishlist["name"], "Test Rename")
+        updated_wishlist = response.get_json()
+        self.assertEqual(updated_wishlist["name"], "new name")
+        self.assertEqual(updated_wishlist["owner_id"], 5)
 
     def test_update_wishlist_not_found(self):
         """It should not Update a Wishlist who doesn't exist"""
-        response = self.app.put(f"{BASE_URL}/0", json={})
+        test_wishlist = WishlistsFactory()
+        response = self.app.put(f"{BASE_URL}/{test_wishlist.id}", json=test_wishlist.serialize())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
