@@ -79,6 +79,39 @@ def create_wishlist():
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
+
+# Add an Item to a Wishlist
+@app.route("/wishlists/<int:wishlist_id>/items", methods=["POST"])
+def create_item(wishlist_id):
+    """
+    Create an item on an order
+    This endpoint will add an item to an order
+    """
+    app.logger.info("Request to create an Item for Order with id: %s", wishlist_id)
+    check_content_type("application/json")
+
+    # See if the order exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+
+    # Create an item from the json data
+    item = Item()
+    item.deserialize(request.get_json())
+
+    # Append the item to the order
+    wishlist.wishlist_items.append(item)
+    wishlist.update()
+
+    # Prepare a message to return
+    message = item.serialize()
+
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
