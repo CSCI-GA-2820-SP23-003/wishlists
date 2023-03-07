@@ -48,6 +48,4 @@ def update_wishlist(wishlist_id):
     wishlist.update()
 
     return wishlist.serialize(), status.HTTP_200_OK
-
-
     
