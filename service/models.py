@@ -33,21 +33,28 @@ class Wishlist(db.Model):
     app = None
 
     # Table Schema
-    wishlist_id = db.Column(db.Integer, primary_key=True)
-    wishlist_name = db.Column(db.String(63), nullable=False)
+    
+    #wishlist_id = db.Column(db.Integer, primary_key=True)
+    #wishlist_name = db.Column(db.String(63), nullable=False)
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(63), nullable=False)
     owner_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     wishlist_items = db.relationship("Item", backref="wishlist", cascade="all, delete", lazy=True)
 
     def __repr__(self):
-        return f"<Wishlist {self.wishlist_name} id=[{self.wishlist_id}]>"
-
+        #return f"<Wishlist {self.wishlist_name} id=[{self.wishlist_id}]>"
+        return f"<Wishlist {self.name} id=[{self.id}]>"
+    
     def create(self):
         """
         Creates a Wishlist to the database
         """
-        logger.info("Creating %s", self.wishlist_name)
-        self.wishlist_id = None  # pylint: disable=invalid-name
+        #logger.info("Creating %s", self.wishlist_name)
+        logger.info("Creating %s", self.name)
+        #self.wishlist_id = None  # pylint: disable=invalid-name
+        self.id = None  # pylint: disable=invalid-name
         db.session.add(self)
         db.session.commit()
 
@@ -55,21 +62,28 @@ class Wishlist(db.Model):
         """
         Updates a Wishlist to the database
         """
-        logger.info("Saving %s", self.wishlist_name)
-        if not self.wishlist_id:
+        #logger.info("Saving %s", self.wishlist_name)
+        logger.info("Saving %s", self.name)
+        #if not self.wishlist_id:
+        if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
         """ Removes a Wishlist from the data store """
-        logger.info("Deleting %s", self.wishlist_name)
+        #logger.info("Deleting %s", self.wishlist_name)
+        logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
         """ Serializes a Wishlist into a dictionary """
-        return {"wishlist_id": self.wishlist_id,
-                "wishlist_name": self.wishlist_name,
+        #return {"wishlist_id": self.wishlist_id,
+        #        "wishlist_name": self.wishlist_name,
+        #        "owner_id": self.owner_id,
+        #        "created_at": self.created_at}
+        return {"id": self.id,
+                "name": self.name,
                 "owner_id": self.owner_id,
                 "created_at": self.created_at}
 
@@ -81,7 +95,8 @@ class Wishlist(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            self.wishlist_name = data["wishlist_name"]
+            #self.wishlist_name = data["wishlist_name"]
+            self.name = data["name"]
             if isinstance(data["owner_id"], int):
                 self.owner_id = data["owner_id"]
             else:
@@ -120,10 +135,11 @@ class Wishlist(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, wishlist_id):
+    def find(cls, id):
         """ Finds a Wishlist by it's ID """
-        logger.info("Processing lookup for id %s ...", wishlist_id)
-        return cls.query.get(wishlist_id)
+        #logger.info("Processing lookup for id %s ...", wishlist_id)
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.get(id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -133,7 +149,8 @@ class Wishlist(db.Model):
             name (string): the name of the Wishlist you want to match
         """
         logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.wishlist_name == name)
+        #return cls.query.filter(cls.wishlist_name == name)
+        return cls.query.filter(cls.name == name)
 
     @classmethod
     def find_by_owner_id(cls, owner_id):
@@ -145,10 +162,15 @@ class Wishlist(db.Model):
         return cls.query.filter(cls.owner_id == owner_id)
 
     @classmethod
-    def find_or_404(cls, wishlist_id):
+    #def find_or_404(cls, wishlist_id):
+    #    """ Finds a wishlist item by it's ID """
+    #    logger.info("Processing lookup or 404 for id %s ...", wishlist_id)
+    #    return cls.query.get_or_404(wishlist_id)
+
+    def find_or_404(cls, id):
         """ Finds a wishlist item by it's ID """
-        logger.info("Processing lookup or 404 for id %s ...", wishlist_id)
-        return cls.query.get_or_404(wishlist_id)
+        logger.info("Processing lookup or 404 for id %s ...", id)
+        return cls.query.get_or_404(id)
 
 
 class Item(db.Model):
@@ -159,22 +181,23 @@ class Item(db.Model):
     app = None
 
     # Table Schema
-    item_id = db.Column(db.Integer, primary_key=True)
+    
+    id = db.Column(db.Integer, primary_key=True)
     wishlist_id = db.Column(
-        db.Integer, db.ForeignKey("wishlist.wishlist_id", ondelete="CASCADE"), nullable=False)
+        db.Integer, db.ForeignKey("wishlist.id", ondelete="CASCADE"), nullable=False)
     product_id = db.Column(db.Integer, nullable=False)
     item_quantity = db.Column(db.Integer, nullable=False, default=1)
     product_name = db.Column(db.String(63), nullable=False)
 
     def __repr__(self):
-        return f"<Item {self.product_name} id=[{self.item_id}]>"
+        return f"<Item {self.product_name} id=[{self.id}]>"
 
     def create(self):
         """
         Creates an Item to the database
         """
         logger.info("Creating %s", self.product_name)
-        self.item_id = None  # pylint: disable=invalid-name
+        self.id = None  # pylint: disable=invalid-name
         db.session.add(self)
         db.session.commit()
 
@@ -183,7 +206,7 @@ class Item(db.Model):
         Updates an Item to the database
         """
         logger.info("Saving %s", self.product_name)
-        if not self.item_id:
+        if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
@@ -195,7 +218,7 @@ class Item(db.Model):
 
     def serialize(self):
         """ Serializes an Item into a dictionary """
-        return {"item_id": self.item_id,
+        return {"id": self.id,
                 "product_name": self.product_name,
                 "product_id": self.product_id,
                 "wishlist_id": self.wishlist_id,
@@ -282,10 +305,10 @@ class Item(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, item_id):
+    def find(cls, id):
         """ Finds an Item by it's ID """
-        logger.info("Processing lookup for id %s ...", item_id)
-        return cls.query.get(item_id)
+        logger.info("Processing lookup for id %s ...", id)
+        return cls.query.get(id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -307,7 +330,7 @@ class Item(db.Model):
         return cls.query.filter(cls.wishlist_id == wishlist_id)
 
     @classmethod
-    def find_or_404(cls, item_id):
+    def find_or_404(cls, id):
         """ Finds an Item item by it's ID """
-        logger.info("Processing lookup or 404 for id %s ...", item_id)
-        return cls.query.get_or_404(item_id)
+        logger.info("Processing lookup or 404 for id %s ...", id)
+        return cls.query.get_or_404(id)
