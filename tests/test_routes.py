@@ -94,6 +94,30 @@ class TestWishlistService(TestCase):
         data = response.get_json()
         self.assertIn("was not found", data["message"])
 
+    def test_rename_wishlist(self):
+        """It should rename the wishlist."""
+        test_wishlist = WishlistsFactory()
+        response = self.app.post(BASE_URL, json=test_wishlist.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_wishlist = response.get_json()
+        new_wishlist["name"] = "new name"
+        new_wishlist["owner_id"] = 5
+        response = self.app.put(
+            f"{BASE_URL}/{new_wishlist['id']}", json=new_wishlist
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_wishlist = response.get_json()
+        self.assertEqual(updated_wishlist["name"], "new name")
+        self.assertEqual(updated_wishlist["owner_id"], 5)
+
+    def test_update_wishlist_not_found(self):
+        """It should not Update a Wishlist who doesn't exist"""
+        test_wishlist = WishlistsFactory()
+        response = self.app.put(f"{BASE_URL}/{test_wishlist.id}", json=test_wishlist.serialize())
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 ######################################################################
 #  T E S T   ITEMS   S E R V I C E
@@ -134,27 +158,3 @@ class TestItemService(TestCase):
         """ It should call the home page """
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-    def test_rename_wishlist(self):
-        """It should rename the wishlist."""
-        test_wishlist = WishlistsFactory()
-        response = self.app.post(BASE_URL, json=test_wishlist.serialize())
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        new_wishlist = response.get_json()
-        new_wishlist["name"] = "new name"
-        new_wishlist["owner_id"] = 5
-        response = self.app.put(
-            f"{BASE_URL}/{new_wishlist['id']}", json=new_wishlist
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        updated_wishlist = response.get_json()
-        self.assertEqual(updated_wishlist["name"], "new name")
-        self.assertEqual(updated_wishlist["owner_id"], 5)
-
-    def test_update_wishlist_not_found(self):
-        """It should not Update a Wishlist who doesn't exist"""
-        test_wishlist = WishlistsFactory()
-        response = self.app.put(f"{BASE_URL}/{test_wishlist.id}", json=test_wishlist.serialize())
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
