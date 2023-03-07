@@ -34,9 +34,6 @@ class Wishlist(db.Model):
 
     # Table Schema
     
-    #wishlist_id = db.Column(db.Integer, primary_key=True)
-    #wishlist_name = db.Column(db.String(63), nullable=False)
-    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(63), nullable=False)
     owner_id = db.Column(db.Integer, nullable=False)
@@ -44,16 +41,13 @@ class Wishlist(db.Model):
     wishlist_items = db.relationship("Item", backref="wishlist", cascade="all, delete", lazy=True)
 
     def __repr__(self):
-        #return f"<Wishlist {self.wishlist_name} id=[{self.wishlist_id}]>"
         return f"<Wishlist {self.name} id=[{self.id}]>"
     
     def create(self):
         """
         Creates a Wishlist to the database
         """
-        #logger.info("Creating %s", self.wishlist_name)
         logger.info("Creating %s", self.name)
-        #self.wishlist_id = None  # pylint: disable=invalid-name
         self.id = None  # pylint: disable=invalid-name
         db.session.add(self)
         db.session.commit()
@@ -62,26 +56,19 @@ class Wishlist(db.Model):
         """
         Updates a Wishlist to the database
         """
-        #logger.info("Saving %s", self.wishlist_name)
         logger.info("Saving %s", self.name)
-        #if not self.wishlist_id:
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
         """ Removes a Wishlist from the data store """
-        #logger.info("Deleting %s", self.wishlist_name)
         logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
         """ Serializes a Wishlist into a dictionary """
-        #return {"wishlist_id": self.wishlist_id,
-        #        "wishlist_name": self.wishlist_name,
-        #        "owner_id": self.owner_id,
-        #        "created_at": self.created_at}
         return {"id": self.id,
                 "name": self.name,
                 "owner_id": self.owner_id,
@@ -95,7 +82,6 @@ class Wishlist(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
-            #self.wishlist_name = data["wishlist_name"]
             self.name = data["name"]
             if isinstance(data["owner_id"], int):
                 self.owner_id = data["owner_id"]
@@ -137,7 +123,6 @@ class Wishlist(db.Model):
     @classmethod
     def find(cls, id):
         """ Finds a Wishlist by it's ID """
-        #logger.info("Processing lookup for id %s ...", wishlist_id)
         logger.info("Processing lookup for id %s ...", id)
         return cls.query.get(id)
 
@@ -149,7 +134,6 @@ class Wishlist(db.Model):
             name (string): the name of the Wishlist you want to match
         """
         logger.info("Processing name query for %s ...", name)
-        #return cls.query.filter(cls.wishlist_name == name)
         return cls.query.filter(cls.name == name)
 
     @classmethod
@@ -162,11 +146,6 @@ class Wishlist(db.Model):
         return cls.query.filter(cls.owner_id == owner_id)
 
     @classmethod
-    #def find_or_404(cls, wishlist_id):
-    #    """ Finds a wishlist item by it's ID """
-    #    logger.info("Processing lookup or 404 for id %s ...", wishlist_id)
-    #    return cls.query.get_or_404(wishlist_id)
-
     def find_or_404(cls, id):
         """ Finds a wishlist item by it's ID """
         logger.info("Processing lookup or 404 for id %s ...", id)

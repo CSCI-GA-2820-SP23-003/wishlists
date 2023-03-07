@@ -59,13 +59,10 @@ class TestWishlistsModel(unittest.TestCase):
     def test_create_a_wishlist(self):
         """It should Create a wishlist and assert that it exists"""
         create_time = datetime.datetime.now()
-        #wishlist = Wishlist(wishlist_name="first wishlist", owner_id=1, created_at=create_time)
         wishlist = Wishlist(name="first wishlist", owner_id=1, created_at=create_time)
         self.assertEqual(str(wishlist), "<Wishlist first wishlist id=[None]>")
         self.assertTrue(wishlist is not None)
-        #self.assertEqual(wishlist.wishlist_id, None)
         self.assertEqual(wishlist.id, None)
-        #self.assertEqual(wishlist.wishlist_name, "first wishlist")
         self.assertEqual(wishlist.name, "first wishlist")
         self.assertEqual(wishlist.owner_id, 1)
         self.assertEqual(wishlist.created_at, create_time)
@@ -75,14 +72,11 @@ class TestWishlistsModel(unittest.TestCase):
         wishlists = Wishlist.all()
         self.assertEqual(wishlists, [])
         current_time = datetime.datetime.now()
-        #wishlist = Wishlist(wishlist_name="first wishlist", owner_id=1, created_at=current_time)
         wishlist = Wishlist(name="first wishlist", owner_id=1, created_at=current_time)
         self.assertTrue(wishlist is not None)
-        #self.assertEqual(wishlist.wishlist_id, None)
         self.assertEqual(wishlist.id, None)
         wishlist.create()
         # Assert that it was assigned an id and shows up in the database
-        #self.assertIsNotNone(wishlist.wishlist_id)
         self.assertIsNotNone(wishlist.id)
         wishlists = Wishlist.all()
         logging.info(wishlist.id)
