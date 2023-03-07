@@ -57,7 +57,7 @@ tests/              - test cases package
 
 ## APIs
 
-# List all the wishlists
+### List all the wishlists
 
 Endpoint : /wishlists
 
