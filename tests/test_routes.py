@@ -380,7 +380,7 @@ class TestItemService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        # update item with wrong order id
+        # update item with wrong wishlist id
         updated_item = ItemsFactory()
         updated_item.wishlist_id = item.wishlist_id + 123
         updated_item.id = item.id
@@ -391,4 +391,4 @@ class TestItemService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
-        self.assertEqual(data["message"], f"404 Not Found: Order with id '{updated_item.wishlist_id}' was not found.")
+        self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{updated_item.wishlist_id}' was not found.")

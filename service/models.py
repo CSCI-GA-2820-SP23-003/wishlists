@@ -307,10 +307,7 @@ class Item(db.Model):
     
     @classmethod
     def find_by_wishlist_and_item_id(cls, wishlist_id, item_id):
-        """Returns all Item with the given owner id
-        Args:
-            name (string): the name of the WishlistModels you want to match
-        """
+        """Returns the Item with the given item id and wishlist id"""
         logger.info("Processing query for wishlist id %s and item id %s ...", str(wishlist_id), str(item_id))
         item = cls.query.get(item_id)
         if item and item.wishlist_id == wishlist_id:

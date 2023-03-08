@@ -125,7 +125,7 @@ def update_item(wishlist_id, item_id):
     if not wishlist:
         abort(
             status.HTTP_404_NOT_FOUND,
-            f"Order with id '{wishlist_id}' was not found.",
+            f"Wishlist with id '{wishlist_id}' was not found.",
         )
 
     # Read an item with item_id
