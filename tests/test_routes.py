@@ -167,6 +167,16 @@ class TestWishlistService(TestCase):
         # delete 4th wishlist with its id
         response = self.app.delete(f"{BASE_URL}/{wishlist.id}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_delete_non_exist_wishlist(self):
+        """It should throw wishlist not found"""
+        # get the id of an wishlist
+        wishlist = self.__create_wishlists(1)[0]
+        # lets delete the wishlist we created
+        resp = self.app.delete(f"{BASE_URL}/{wishlist.id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # No delete the wishlist again which does not exist
+        resp = self.app.delete(f"{BASE_URL}/{wishlist.id}")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 ######################################################################
 #  T E S T   ITEMS   S E R V I C E

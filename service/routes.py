@@ -186,6 +186,11 @@ def delete_wishlist(wishlist_id):
     """
     app.logger.info("Request to delete wishlist with id")
     wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
     if wishlist:
         wishlist.delete()
         app.logger.info("Wishlist with ID [%s] delete complete.", wishlist.id)
