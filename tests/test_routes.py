@@ -309,3 +309,86 @@ class TestItemService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{wishlist_id}' was not found.")
+
+    def test_update_item(self):
+        """It should Update an item"""
+        wishlist = self.__create_wishlists(1)[0]
+        item = ItemsFactory()
+    
+        # add item
+        resp = self.app.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+    
+        data = resp.get_json()
+        item.id = data["id"]
+        self.assertIsNotNone(data["id"])
+        self.assertEqual(data["wishlist_id"], wishlist.id)
+        self.assertEqual(data["product_id"], item.product_id)
+        self.assertEqual(data["item_quantity"], item.item_quantity)
+        self.assertEqual(data["product_name"], item.product_name)
+    
+        # update item wishlist id
+        updated_item = ItemsFactory()
+        updated_item.wishlist_id = item.wishlist_id
+        updated_item.id = item.id
+        resp = self.app.put(
+            f"{BASE_URL}/{wishlist.id}/items/{item.id}",
+            json=updated_item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    
+        resp_item = resp.get_json()
+        self.assertIsNotNone(resp_item["id"])
+        self.assertEqual(resp_item["wishlist_id"], wishlist.id)
+        self.assertEqual(resp_item["product_id"], updated_item.product_id)
+        self.assertEqual(resp_item["item_quantity"], updated_item.item_quantity)
+        self.assertEqual(resp_item["product_name"], updated_item.product_name)
+    
+    def test_update_item_not_found(self):
+        """It should not Update an item given wrong wishlist id and non-existent item"""
+        wishlist = self.__create_wishlists(1)[0]
+        
+        item_id = 4
+
+        # update non-existent item id
+        item = ItemsFactory()
+        response = self.app.put(
+            f"{BASE_URL}/{wishlist.id}/items/{item_id}",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertEqual(data["message"], f"404 Not Found: Item with id '{item_id}' was not found.")
+
+    def test_update_item_nonexistent_wishlist(self):
+        """It should not Update an item given wrong wishlist id"""
+        wishlist = self.__create_wishlists(1)[0]
+        item = ItemsFactory()
+        item.wishlist_id = wishlist.id
+
+        # add item
+        resp = self.app.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update item with wrong order id
+        updated_item = ItemsFactory()
+        updated_item.wishlist_id = item.wishlist_id + 123
+        updated_item.id = item.id
+        resp = self.app.put(
+            f"{BASE_URL}/{updated_item.wishlist_id}/items/{updated_item.id}",
+            json=updated_item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = resp.get_json()
+        self.assertEqual(data["message"], f"404 Not Found: Order with id '{updated_item.wishlist_id}' was not found.")
