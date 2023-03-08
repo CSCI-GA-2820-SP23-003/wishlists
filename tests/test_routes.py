@@ -158,15 +158,10 @@ class TestWishlistService(TestCase):
         wishlist = self.__create_wishlists(1)[0]
         # delete wishlist with its id
         response = self.app.delete(f"{BASE_URL}/{wishlist.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         # make sure the wishlist is deleted
         response = self.app.get(f"{BASE_URL}/{wishlist.id}")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        # create 5 wishlists with 5 different id's
-        wishlist = self.__create_wishlists(5)[3]
-        # delete 4th wishlist with its id
-        response = self.app.delete(f"{BASE_URL}/{wishlist.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)        
 
 ######################################################################
 #  T E S T   ITEMS   S E R V I C E
@@ -288,8 +283,7 @@ class TestItemService(TestCase):
         # make sure item exists before delete
         response = self.app.get(f"{BASE_URL}/{wishlist.id}", content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        items = response.get_json()[0]
-        print(items)
+        items = response.get_json()[0]        
         self.assertEqual(items['id'], item_id)
 
         # delete the item

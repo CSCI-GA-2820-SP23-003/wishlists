@@ -189,7 +189,7 @@ def delete_wishlist(wishlist_id):
     if wishlist:
         wishlist.delete()
         app.logger.info("Wishlist with ID [%s] delete complete.", wishlist.id)
-    return jsonify(wishlist.serialize()), status.HTTP_200_OK
+    return make_response("", status.HTTP_204_NO_CONTENT)
 
 # delete Item from Wishlist
 @app.route("/wishlists/<int:wishlist_id>/items/<int:item_id>", methods=["DELETE"])
