@@ -43,7 +43,7 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-# GET Wishlist
+# GETs Wishlist with a specific wishlist_id
 @app.route("/wishlists/<int:wishlist_id>", methods=["GET"])
 def get_wishlists(wishlist_id):
     """
@@ -56,8 +56,9 @@ def get_wishlists(wishlist_id):
     if not wishlist:
         abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
 
-    app.logger.info("Returning Wishlist: %s", wishlist.name)
-    return jsonify(wishlist.serialize()), status.HTTP_200_OK
+    items = [item.serialize() for item in wishlist.wishlist_items]    
+    app.logger.info("Returning %d items", len(items))
+    return jsonify(items), status.HTTP_200_OK
 
 
 # Add Wishlist
