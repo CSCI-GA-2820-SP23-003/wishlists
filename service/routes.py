@@ -42,6 +42,7 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
+
 # GETs Wishlist with a specific wishlist_id
 @app.route("/wishlists/<int:wishlist_id>", methods=["GET"])
 def get_wishlists(wishlist_id):
@@ -88,6 +89,28 @@ def create_wishlist():
 
     app.logger.info("Wishlist with ID [%s] created.", wishlist.id)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    
+
+# Update Wishlist
+@app.route("/wishlists/<wishlist_id>", methods = ["PUT"])
+def update_wishlist(wishlist_id):
+    """ Update a wishlist"""
+    app.logger.info(f"Request to update wishlist {wishlist_id}")
+    wishlist = Wishlist.find(wishlist_id)
+
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+
+    body = request.get_json()
+    for key, value in body.items():
+        setattr(wishlist, key, value)
+
+    wishlist.update()
+
+    return wishlist.serialize(), status.HTTP_200_OK
 
 
 
@@ -188,3 +211,4 @@ def check_content_type(content_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
+
