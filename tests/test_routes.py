@@ -169,7 +169,7 @@ class TestItemService(TestCase):
         """ This runs after each test """
         db.session.remove()
 
-    def _create_wishlists(self, count):
+    def __create_wishlists(self, count):
         """Factory method to create wishlists in bulk"""
         wishlists = []
         for _ in range(count):
@@ -194,7 +194,7 @@ class TestItemService(TestCase):
 
     def test_add_item(self):
         """It should Add an item to a wishlist"""
-        wishlist = self._create_wishlists(1)[0]
+        wishlist = self.__create_wishlists(1)[0]
         item = ItemsFactory()
         resp = self.app.post(
             f"{BASE_URL}/{wishlist.id}/items",
