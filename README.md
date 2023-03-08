@@ -74,7 +74,8 @@ Route | Operation | Description
 GET /wishlists/`<wishlist_id>` | READ | Show a single wishlist
 GET /wishlists | LIST | Show all wishlists
 POST /wishlists | CREATE | Create new Wishlist
-PUT /wishlists/`<id>` | UPDATE | Update wishlist
+PUT /wishlists/`<wishlist_id>` | UPDATE | Update wishlist
+PUT /wishlists/`<wishlist_id>`/items/`<item_id>` | UPDATE | Update item from Wishlist
 POST /wishlists/`<wishlist_id>`/items | CREATE | Add item to wishlist
 DELETE /wishlists/`<wishlist_id>` | DELETE | Delete given Wishlist
 DELETE /wishlists/`<wishlist_id>`/items/`<item_id>` | DELETE | Delete item from Wishlist
