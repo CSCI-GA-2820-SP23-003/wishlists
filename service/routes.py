@@ -28,16 +28,15 @@ def healthcheck():
 def index():
     """Root URL response"""
     app.logger.info("Request for Root URL")
-    return "Running Route",status.HTTP_200_OK
 
-    # return (
-    #     jsonify(
-    #         name="Wishlists REST API Service",
-    #         version="1.0",
-    #         paths=url_for("list_wishlists", _external=True),
-    #     ),
-    #     status.HTTP_200_OK,
-    # )
+    return (
+        jsonify(
+            name="Wishlists REST API Service",
+            version="1.0",
+            paths=url_for("list_wishlists", _external=True),
+        ),
+        status.HTTP_200_OK,
+    )
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
@@ -60,6 +59,17 @@ def get_wishlists(wishlist_id):
     app.logger.info("Returning %d items", len(items))
     return jsonify(items), status.HTTP_200_OK
 
+# LIST wishlist
+@app.route("/wishlists", methods=["GET"])
+def list_wishlists():
+    """
+    List all the wishlists
+    """    
+    app.logger.info("Request for listing all the wishlists")
+    wishlists = Wishlist.all()
+    results = [wishlist.serialize() for wishlist in wishlists]
+    app.logger.info("Returning %d wishlists", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 # Add Wishlist
 @app.route("/wishlists", methods=["POST"])

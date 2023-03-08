@@ -120,6 +120,14 @@ class TestWishlistService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_list_wishlists(self):
+        """ It should list all wishlists"""
+        self.__create_wishlists(10)
+        response = self.app.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 10)
+
 
 ######################################################################
 #  T E S T   ITEMS   S E R V I C E
