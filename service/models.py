@@ -301,10 +301,7 @@ class Item(db.Model):
 
     @classmethod
     def find_by_wishlist_id(cls, wishlist_id):
-        """Returns all Item with the given owner id
-        Args:
-            name (string): the name of the WishlistModels you want to match
-        """
+        """Returns all Item with the given wishlist id"""
         logger.info("Processing owner id query for %s ...", str(wishlist_id))
         return cls.query.filter(cls.wishlist_id == wishlist_id)
 

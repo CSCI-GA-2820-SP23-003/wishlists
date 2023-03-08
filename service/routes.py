@@ -122,6 +122,49 @@ def create_item(wishlist_id):
 
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
+# delete Wishlist
+@app.route("/wishlists/<int:wishlist_id>", methods=["DELETE"])
+def delete_wishlist(wishlist_id):
+    """
+    Deletes a Wishlist
+    This endpoint will delete a Wishlist based on it's id
+    """
+    app.logger.info("Request to delete wishlist with id")
+    wishlist = Wishlist.find(wishlist_id)
+    if wishlist:
+        wishlist.delete()
+        app.logger.info("Wishlist with ID [%s] delete complete.", wishlist.id)
+    return jsonify(wishlist.serialize()), status.HTTP_200_OK
+
+# delete Item from Wishlist
+@app.route("/wishlists/<int:wishlist_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_item(wishlist_id, item_id):
+    """
+    Deletes a Item from Wishlist
+    This endpoint will delete an Item from Wishlist based on their id
+    """
+    app.logger.info("Request to delete item from wishlist")
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+    item = Item.find(item_id)
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"item with id '{item_id}' was not found.",
+        )
+    if wishlist_id != item.wishlist_id:
+        abort(
+            status.HTTP_404_NOT_FOUND, 
+            f"Wishlist with id '{wishlist_id}' do not have it with id '{item_id}'"
+        )
+    item.delete()
+    app.logger.info("Item with ID [%s] deleted from wishlist with ID [%s]", item_id, wishlist_id)
+    return "", status.HTTP_204_NO_CONTENT
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
