@@ -28,23 +28,22 @@ def healthcheck():
 def index():
     """Root URL response"""
     app.logger.info("Request for Root URL")
-    return "Running Route",status.HTTP_200_OK
 
-    # return (
-    #     jsonify(
-    #         name="Wishlists REST API Service",
-    #         version="1.0",
-    #         paths=url_for("list_wishlists", _external=True),
-    #     ),
-    #     status.HTTP_200_OK,
-    # )
+    return (
+        jsonify(
+            name="Wishlists REST API Service",
+            version="1.0",
+            paths=url_for("list_wishlists", _external=True),
+        ),
+        status.HTTP_200_OK,
+    )
 
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
-    
-# GET Wishlist
+
+# GETs Wishlist with a specific wishlist_id
 @app.route("/wishlists/<int:wishlist_id>", methods=["GET"])
 def get_wishlists(wishlist_id):
     """
@@ -57,9 +56,21 @@ def get_wishlists(wishlist_id):
     if not wishlist:
         abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
 
-    app.logger.info("Returning Wishlist: %s", wishlist.name)
-    return jsonify(wishlist.serialize()), status.HTTP_200_OK
+    items = [item.serialize() for item in wishlist.wishlist_items]    
+    app.logger.info("Returning %d items", len(items))
+    return jsonify(items), status.HTTP_200_OK
 
+# LIST wishlist
+@app.route("/wishlists", methods=["GET"])
+def list_wishlists():
+    """
+    List all the wishlists
+    """    
+    app.logger.info("Request for listing all the wishlists")
+    wishlists = Wishlist.all()
+    results = [wishlist.serialize() for wishlist in wishlists]
+    app.logger.info("Returning %d wishlists", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 # Add Wishlist
 @app.route("/wishlists", methods=["POST"])
@@ -100,6 +111,82 @@ def update_wishlist(wishlist_id):
     wishlist.update()
 
     return wishlist.serialize(), status.HTTP_200_OK
+
+
+
+# Add an Item to a Wishlist
+@app.route("/wishlists/<int:wishlist_id>/items", methods=["POST"])
+def create_item(wishlist_id):
+    """
+    Create an item on a wishlist
+    This endpoint will add an item to a wishlist
+    """
+    app.logger.info("Request to create an Item for Wishlist with id: %s", wishlist_id)
+    check_content_type("application/json")
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+
+    # Create an item from the json data
+    item = Item()
+    item.deserialize(request.get_json())
+
+    # Append the item to the wishlist
+    wishlist.wishlist_items.append(item)
+    wishlist.update()
+
+    # Prepare a message to return
+    message = item.serialize()
+
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+# delete Wishlist
+@app.route("/wishlists/<int:wishlist_id>", methods=["DELETE"])
+def delete_wishlist(wishlist_id):
+    """
+    Deletes a Wishlist
+    This endpoint will delete a Wishlist based on it's id
+    """
+    app.logger.info("Request to delete wishlist with id")
+    wishlist = Wishlist.find(wishlist_id)
+    if wishlist:
+        wishlist.delete()
+        app.logger.info("Wishlist with ID [%s] delete complete.", wishlist.id)
+    return jsonify(wishlist.serialize()), status.HTTP_200_OK
+
+# delete Item from Wishlist
+@app.route("/wishlists/<int:wishlist_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_item(wishlist_id, item_id):
+    """
+    Deletes a Item from Wishlist
+    This endpoint will delete an Item from Wishlist based on their id
+    """
+    app.logger.info("Request to delete item from wishlist")
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' was not found.",
+        )
+    item = Item.find(item_id)
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"item with id '{item_id}' was not found.",
+        )
+    if wishlist_id != item.wishlist_id:
+        abort(
+            status.HTTP_404_NOT_FOUND, 
+            f"Wishlist with id '{wishlist_id}' do not have it with id '{item_id}'"
+        )
+    item.delete()
+    app.logger.info("Item with ID [%s] deleted from wishlist with ID [%s]", item_id, wishlist_id)
+    return "", status.HTTP_204_NO_CONTENT
 
 
 ######################################################################
