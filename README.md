@@ -3,29 +3,34 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
+Wishlist Service - Represents the wishlists created by Customers at an eCommerce Website
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This project contains the code for Wishlist Service. The service consists of Wishlist Resource and WishlistItem Resource (subordinate). The `/service` folder contains a `models.py` file for Wishlist and WishlistItems models and a `routes.py` file for the service. The `/tests` folder contains the test cases for testing the model and the service separately.
 
-## Automatic Setup
-
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
 
 ## Manual Setup
 
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
+1. Clone this git repository.
+2. Open this project in the docker container.
+3. Initialize the database by (We recommend this to avoid db error)
+   1. Run ```flask db init``` to initialize the migration folder.
+   2. Run ```flask db migrate``` to migrate the models to db schema.
+   3. Run ```flask db upgrade``` to apply  the schema to database.
+4. Run the app by ```flask run```
+5. It's will be host on ```http://localhost:8000```
 
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
+## Test
 
-These should be copied using a bash shell as follows:
+To run or test our service.
+run command as follow in command line
 
 ```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
+nosetests
 ```
+
+Current coverage is 95%
 
 ## Contents
 
@@ -40,20 +45,39 @@ dot-env-example     - copy to .env to use environment variables
 requirements.txt    - list if Python libraries required by your code
 config.py           - configuration parameters
 
-service/                   - service python package
-├── __init__.py            - package initializer
-├── models.py              - module with business models
-├── routes.py              - module with service routes
-└── common                 - common code package
-    ├── error_handlers.py  - HTTP error handling code
-    ├── log_handlers.py    - logging setup code
-    └── status.py          - HTTP status constants
+service/                     - service python package
+├── __init__.py              - package initializer
+├── models.py                - module with business models
+├── routes.py                - module with service routes
+├── config.py                - configuration parameters
+└── common                   - common code package
+    ├── error_handlers.py    - HTTP error handling code
+    ├── log_handlers.py      - logging setup code
+    ├── cli_commands.py      - flask cli command extension
+    └── status.py            - HTTP status constants
 
-tests/              - test cases package
-├── __init__.py     - package initializer
-├── test_models.py  - test suite for business models
-└── test_routes.py  - test suite for service routes
+tests/                       - test cases package
+├── __init__.py              - package initializer
+├── factories.py             - test factory to make testing objects
+├── test_items_model.py      - test suite for item models
+├── test_wishlists_models.py - test suite for wishlist models
+├── test_cli_commands.py     - test suite for cli commands
+└── test_routes.py           - test suite for service routes
 ```
+
+## Available REST API's
+
+Route | Operation | Description
+-- | -- | --
+/healthcheck | | Service Healthcheck
+/ | root index | Root URL returns service name
+GET /wishlists/`<wishlist_id>` | READ | Show a single wishlist
+GET /wishlists | LIST | Show all wishlists
+POST /wishlists | CREATE | Create new Wishlist
+PUT /wishlists/`<id>` | UPDATE | Update wishlist
+POST /wishlists/`<wishlist_id>`/items | CREATE | Add item to wishlist
+DELETE /wishlists/`<wishlist_id>` | DELETE | Delete given Wishlist
+DELETE /wishlists/`<wishlist_id>`/items/`<item_id>` | DELETE | Delete item from Wishlist
 
 ## License
 
