@@ -62,7 +62,7 @@ class TestWishlistService(TestCase):
             test_wishlist = WishlistsFactory()
             response = self.app.post(BASE_URL, json=test_wishlist.serialize())
             self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test order"
+                response.status_code, status.HTTP_201_CREATED, "Could not create test wishlist"
             )
             new_wishlist = response.get_json()
             test_wishlist.id = new_wishlist["id"]
@@ -76,16 +76,7 @@ class TestWishlistService(TestCase):
     def test_index(self):
         """ It should call the home page """
         resp = self.app.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-    def test_get_wishlist(self):
-        """It should Read a single Wishlist"""
-        # get the id of a order
-        test_wishlist = self.__create_wishlists(1)[0]
-        response = self.app.get(f"{BASE_URL}/{test_wishlist.id}")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(data["id"], test_wishlist.id)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)    
 
     def test_get_wishlist_not_found(self):
         """It should not Read a Wishlist thats not found"""
@@ -111,15 +102,7 @@ class TestWishlistService(TestCase):
         self.assertEqual(new_wishlist["id"], 1)
         self.assertEqual(new_wishlist["name"], test_wishlist.name)
         self.assertEqual(new_wishlist["owner_id"], test_wishlist.owner_id)
-
-        # Check that the location header was correct
-        response = self.app.get(location)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        location_wishlist = response.get_json()
-        self.assertEqual(location_wishlist["id"], 1)
-        self.assertEqual(location_wishlist["name"], test_wishlist.name)
-        self.assertEqual(location_wishlist["owner_id"], test_wishlist.owner_id)
-
+    
     def test_create_wishlists_with_no_data(self):
         """It should not Create an Wishlist with missing data"""
         response = self.app.post(BASE_URL, json={})
@@ -131,7 +114,7 @@ class TestWishlistService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_wishlists_bad_content_type(self):
-        """It should not Create an Order with incorrect content type"""
+        """It should not Create an Wishlist with incorrect content type"""
         response = self.app.post(
             BASE_URL, headers={"Content-Type": "application/octet-stream"}
         )
@@ -176,7 +159,7 @@ class TestItemService(TestCase):
             test_wishlist = WishlistsFactory()
             response = self.app.post(BASE_URL, json=test_wishlist.serialize())
             self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test order"
+                response.status_code, status.HTTP_201_CREATED, "Could not create test wishlist"
             )
             new_wishlist = response.get_json()
             test_wishlist.id = new_wishlist["id"]
@@ -209,7 +192,7 @@ class TestItemService(TestCase):
         self.assertEqual(data["product_name"], item.product_name)
         self.assertEqual(data["item_quantity"], item.item_quantity)
 
-    def test_add_item_no_order(self):
+    def test_add_item_no_wishlist(self):
         """It should not Create a item when wishlist can't be found"""
         wishlist_id = 5
         item = ItemsFactory()
@@ -219,3 +202,23 @@ class TestItemService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_items_list(self):
+        """It should Get a list of Items"""
+        wishlist = self.__create_wishlists(1)[0]
+        item_list = ItemsFactory.create_batch(2)
+        
+        item_one_response = self.app.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item_list[0].serialize(), content_type="application/json"
+        )
+        self.assertEqual(item_one_response.status_code, status.HTTP_201_CREATED)
+        
+        item_two_response = self.app.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item_list[1].serialize(), content_type="application/json"
+        )
+        self.assertEqual(item_two_response.status_code, status.HTTP_201_CREATED)
+        
+        resp = self.app.get(f"{BASE_URL}/{wishlist.id}", content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
