@@ -304,8 +304,15 @@ class Item(db.Model):
         """Returns all Item with the given wishlist id"""
         logger.info("Processing owner id query for %s ...", str(wishlist_id))
         return cls.query.filter(cls.wishlist_id == wishlist_id)
-
-   
+    
+    @classmethod
+    def find_by_wishlist_and_item_id(cls, wishlist_id, item_id):
+        """Returns the Item with the given item id and wishlist id"""
+        logger.info("Processing query for wishlist id %s and item id %s ...", str(wishlist_id), str(item_id))
+        item = cls.query.get(item_id)
+        if item and item.wishlist_id == wishlist_id:
+            return item
+        return None
 
     @classmethod
     def find_or_404(cls, id):
