@@ -43,8 +43,8 @@ def index():
 ######################################################################
 
 
-# GETs Wishlist with a specific wishlist_id
-@app.route("/wishlists/<int:wishlist_id>", methods=["GET"])
+# Lists all the Items in a Wishlist
+@app.route("/wishlists/<int:wishlist_id>/items", methods=["GET"])
 def get_wishlists(wishlist_id):
     """
     Retrieve a single Wishlist
