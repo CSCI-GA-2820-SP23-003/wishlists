@@ -14,9 +14,9 @@ import logging
 import unittest
 import datetime
 from werkzeug.exceptions import NotFound
-from service.models import Wishlist, DataValidationError, db
+from service.models import Wishlist, DataValidationError, db, Item
 from service import app
-from tests.factories import WishlistsFactory
+from tests.factories import WishlistsFactory, ItemsFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -58,14 +58,17 @@ class TestWishlistsModel(unittest.TestCase):
 
     def test_create_a_wishlist(self):
         """It should Create a wishlist and assert that it exists"""
-        create_time = datetime.datetime.now()
+        create_time = datetime.datetime.now()         
         wishlist = Wishlist(name="first wishlist", owner_id=1, created_at=create_time)
+        wishlist_items = [Item(wishlist_id=wishlist.id, product_id=3, item_quantity=2, product_name="Test Product")]
+        wishlist.wishlist_items = wishlist_items
         self.assertEqual(str(wishlist), "<Wishlist first wishlist id=[None]>")
         self.assertTrue(wishlist is not None)
         self.assertEqual(wishlist.id, None)
         self.assertEqual(wishlist.name, "first wishlist")
         self.assertEqual(wishlist.owner_id, 1)
         self.assertEqual(wishlist.created_at, create_time)
+        self.assertEqual(len(wishlist.wishlist_items),1)
 
     def test_add_a_wishlist(self):
         """It should Create a wishlist and add it to the database"""
@@ -148,7 +151,10 @@ class TestWishlistsModel(unittest.TestCase):
     def test_serialize_a_wishlist(self):
         """It should serialize a wishlist"""
         wishlist = WishlistsFactory()
-        data = wishlist.serialize()
+        item = ItemsFactory()
+        item.wishlist_id=wishlist.id
+        wishlist.wishlist_items=[item]
+        data = wishlist.serialize()        
         self.assertNotEqual(data, None)
         self.assertIn("id", data)
         self.assertEqual(data["id"], wishlist.id)
@@ -158,16 +164,38 @@ class TestWishlistsModel(unittest.TestCase):
         self.assertEqual(data["owner_id"], wishlist.owner_id)
         self.assertIn("created_at", data)
         self.assertEqual(data["created_at"], wishlist.created_at)
+        
+        wishlist_item = data['wishlist_items'][0]        
+        self.assertEqual(wishlist_item['id'], item.id)
+        self.assertEqual(wishlist_item['product_name'], item.product_name)
+        self.assertEqual(wishlist_item['item_quantity'], item.item_quantity)
+        self.assertEqual(wishlist_item['wishlist_id'], item.wishlist_id)
+        self.assertEqual(wishlist_item['product_id'], item.product_id)
+        
 
     def test_deserialize_a_wishlist(self):
         """It should de-serialize a wishlist"""
-        data = WishlistsFactory().serialize()
+        wishlist_obj = WishlistsFactory()
+        item_data = ItemsFactory()
+        item_data.wishlist_id=wishlist_obj.id
+        wishlist_obj.wishlist_items=[item_data]
+        wishlist_obj.create()
+        wishlist_data = wishlist_obj.serialize()
         wishlist = Wishlist()
-        wishlist.deserialize(data)
+        
+        wishlist.deserialize(wishlist_data)
         self.assertNotEqual(wishlist, None)
         self.assertEqual(wishlist.id, None)
-        self.assertEqual(wishlist.name, data["name"])
-        self.assertEqual(wishlist.owner_id, data["owner_id"])
+        self.assertEqual(wishlist.name, wishlist_data["name"])
+        self.assertEqual(wishlist.owner_id, wishlist_data["owner_id"])
+
+        wishlist_items = wishlist.wishlist_items        
+        self.assertEqual(len(wishlist_items), 1)
+        self.assertEqual(wishlist_items[0].id, item_data.id)
+        self.assertEqual(wishlist_items[0].item_quantity, item_data.item_quantity)
+        self.assertEqual(wishlist_items[0].product_name, item_data.product_name)
+        self.assertEqual(wishlist_items[0].wishlist_id, wishlist_obj.id)
+        self.assertEqual(wishlist_items[0].product_id, item_data.product_id)    
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a wishlist with missing data"""
@@ -244,3 +272,82 @@ class TestWishlistsModel(unittest.TestCase):
     def test_find_or_404_not_found(self):
         """It should return 404 not found"""
         self.assertRaises(NotFound, Wishlist.find_or_404, 0)
+
+    def test_add_an_wishlist_with_items(self):
+        """It should Create a wishlist with items and add to database"""
+        create_time = datetime.datetime.now()     
+        wishlists = Wishlist.all()
+        self.assertEqual(wishlists, [])
+        
+        wishlist = Wishlist(name="Test Wishlist", owner_id=1, created_at=create_time)
+        item = Item(wishlist_id=wishlist.id, product_id=3, item_quantity=2, product_name="Test Product")
+        wishlist.wishlist_items=[item]        
+        self.assertTrue(wishlist is not None)        
+
+        wishlist.create()
+        
+        self.assertIsNotNone(wishlist.id)
+
+        wishlists = Wishlist.all()
+        self.assertEqual(len(wishlists), 1)
+        self.assertEqual(len(wishlists[0].wishlist_items), 1)
+        self.assertEqual(wishlists[0].wishlist_items[0].id, item.id)
+
+    def test_update_a_wishlist_with_items(self):
+        """It should Update an Wishlist that has items"""
+        wishlist_obj = WishlistsFactory()
+        item_data = ItemsFactory()
+        item_data.wishlist_id=wishlist_obj.id
+        wishlist_obj.wishlist_items=[item_data]
+        wishlist_obj.create()
+        self.assertIsNotNone(wishlist_obj.id)   
+
+        wishlist = Wishlist.find(wishlist_obj.id)
+        fetched_item = wishlist.wishlist_items[0]
+        self.assertEqual(fetched_item.product_id, item_data.product_id)
+
+        #Update the items product id
+        wishlist_id = wishlist.id
+        new_product_id = fetched_item.product_id+1
+        fetched_item.product_id = new_product_id
+        wishlist.update()
+        self.assertEqual(wishlist.id, wishlist_id)
+        self.assertEqual(wishlist.wishlist_items[0].product_id, new_product_id)
+
+        # Fetch it again from DB and make sure only product_id has changed.
+        wishlists = Wishlist.all()
+        self.assertEqual(len(wishlists), 1)
+        self.assertEqual(wishlists[0].id, wishlist_obj.id)
+        self.assertEqual(wishlists[0].wishlist_items[0].product_id, new_product_id)
+
+    def test_get_a_wishlist_with_items(self):
+        """It should Create a wishlist with items and fetch it back"""
+        wishlist_obj = WishlistsFactory()
+        item_data = ItemsFactory()
+        item_data.wishlist_id=wishlist_obj.id
+        wishlist_obj.wishlist_items=[item_data]
+        wishlist_obj.create()
+        self.assertIsNotNone(wishlist_obj.id)        
+        fetched_wishlist = Wishlist.find(wishlist_obj.id)
+        self.assertEqual(fetched_wishlist.id, wishlist_obj.id)
+        self.assertEqual(fetched_wishlist.name, wishlist_obj.name)
+        self.assertEqual(fetched_wishlist.owner_id, wishlist_obj.owner_id)
+        self.assertEqual(len(fetched_wishlist.wishlist_items), 1)
+        self.assertEqual(fetched_wishlist.wishlist_items[0].id, item_data.id)
+        
+    def test_delete_wishlist_item(self):
+        """ Delete an item from a wishlist """
+        wishlist_obj = WishlistsFactory()
+        item_data = ItemsFactory()
+        item_data.wishlist_id=wishlist_obj.id
+        wishlist_obj.wishlist_items=[item_data]
+        wishlist_obj.create()
+        self.assertIsNotNone(wishlist_obj.id)   
+        wishlists = Wishlist.all()
+        self.assertEqual(len(wishlists), 1)        
+        fetched_wishlist = Wishlist.find(wishlist_obj.id)
+        item = fetched_wishlist.wishlist_items[0]
+        item.delete()
+        wishlist_obj.update()        
+        fetched_wishlist_updated = Wishlist.find(wishlist_obj.id)
+        self.assertEqual(len(fetched_wishlist_updated.wishlist_items), 0)
