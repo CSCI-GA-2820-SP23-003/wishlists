@@ -80,7 +80,7 @@ class TestWishlistService(TestCase):
 
     def test_get_wishlist_not_found(self):
         """It should not Read a Wishlist thats not found"""
-        response = self.app.get(f"{BASE_URL}/0")
+        response = self.app.get(f"{BASE_URL}/0/items")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("was not found", data["message"])
@@ -160,7 +160,7 @@ class TestWishlistService(TestCase):
         response = self.app.delete(f"{BASE_URL}/{wishlist.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         # make sure the wishlist is deleted
-        response = self.app.get(f"{BASE_URL}/{wishlist.id}")
+        response = self.app.get(f"{BASE_URL}/{wishlist.id}/items")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)        
 
 ######################################################################
@@ -261,7 +261,7 @@ class TestItemService(TestCase):
         )
         self.assertEqual(item_two_response.status_code, status.HTTP_201_CREATED)
         
-        resp = self.app.get(f"{BASE_URL}/{wishlist.id}", content_type="application/json")
+        resp = self.app.get(f"{BASE_URL}/{wishlist.id}/items", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(len(data), 2)
@@ -281,7 +281,7 @@ class TestItemService(TestCase):
         item_id = data["id"]
 
         # make sure item exists before delete
-        response = self.app.get(f"{BASE_URL}/{wishlist.id}", content_type="application/json")
+        response = self.app.get(f"{BASE_URL}/{wishlist.id}/items", content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         items = response.get_json()[0]        
         self.assertEqual(items['id'], item_id)
@@ -291,7 +291,7 @@ class TestItemService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # make sure item does not exist after delete
-        response = self.app.get(f"{BASE_URL}/{wishlist.id}", content_type="application/json")
+        response = self.app.get(f"{BASE_URL}/{wishlist.id}/items", content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         items = response.get_json()
         self.assertEqual(len(items), 0)
