@@ -20,6 +20,7 @@ class WishlistsFactory(factory.Factory):
     name = factory.Faker("name")
     owner_id = FuzzyChoice(choices=[1, 2, 3])
     created_at = FuzzyDateTime(datetime.datetime(2008, 1, 1, tzinfo=datetime.timezone.utc))
+    wishlist_items=[]
 
 
 class ItemsFactory(factory.Factory):
