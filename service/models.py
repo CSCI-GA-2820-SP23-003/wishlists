@@ -69,17 +69,17 @@ class Wishlist(db.Model):
 
     def serialize(self):
         """ Serializes a Wishlist into a dictionary """
-        items=[]
+        items = []
         for item in self.wishlist_items:
             items.append(Item.serialize(item))
         return {
-            "id": self.id,    
-            "name": self.name,    
-            "owner_id": self.owner_id, 
-            "created_at": self.created_at,   
-            "wishlist_items": items                        
+            "id": self.id,
+            "name": self.name,
+            "owner_id": self.owner_id,
+            "created_at": self.created_at,
+            "wishlist_items": items
         }
-        
+
     def deserialize(self, data):
         """
         Deserializes a Wishlist from a dictionary
@@ -89,14 +89,14 @@ class Wishlist(db.Model):
         """
         try:
 
-            self.name = data["name"]            
+            self.name = data["name"]
             if isinstance(data["owner_id"], int):
-                self.owner_id = data["owner_id"]                
+                self.owner_id = data["owner_id"]
             else:
                 raise DataValidationError(
                     "Invalid type for integer [owner_id]: "
-                    + str(type(data["owner_id"])))            
-            if "wishlist_items" in data:                            
+                    + str(type(data["owner_id"])))
+            if "wishlist_items" in data:
                 for item in data["wishlist_items"]:
                     self.wishlist_items.append(Item().deserialize(item))
 
@@ -262,13 +262,13 @@ class Item(db.Model):
                     raise DataValidationError(
                         "Invalid type for integer [item_quantity]: " + str(type(data["item_quantity"]))
                     )
-                
-            #5. Check if id is present
+
+            # 5. Check if id is present
             if data.get("id", None):
                 if isinstance(data["id"], int):
                     self.id = data["id"]
                 else:
-                    self.id=None
+                    self.id = None
 
         except KeyError as error:
             raise DataValidationError(
@@ -322,7 +322,7 @@ class Item(db.Model):
         """Returns all Item with the given wishlist id"""
         logger.info("Processing owner id query for %s ...", str(wishlist_id))
         return cls.query.filter(cls.wishlist_id == wishlist_id)
-    
+
     @classmethod
     def find_by_wishlist_and_item_id(cls, wishlist_id, item_id):
         """Returns the Item with the given item id and wishlist id"""

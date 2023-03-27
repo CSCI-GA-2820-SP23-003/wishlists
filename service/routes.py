@@ -4,7 +4,7 @@ My Service
 Describe what your service does here
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from service.common import status  # HTTP Status Codes
 from service.models import Wishlist, Item
 
@@ -49,28 +49,30 @@ def get_wishlists(wishlist_id):
     """
     Retrieve a single Wishlist
     This endpoint will return a Wishlist based on it's id
-    """    
+    """
 
     app.logger.info("Request for Wishlist with id: %s", wishlist_id)
     wishlist = Wishlist.find(wishlist_id)
     if not wishlist:
         abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
 
-    items = [item.serialize() for item in wishlist.wishlist_items]    
+    items = [item.serialize() for item in wishlist.wishlist_items]
     app.logger.info("Returning %d items", len(items))
     return jsonify(items), status.HTTP_200_OK
+
 
 # LIST wishlist
 @app.route("/wishlists", methods=["GET"])
 def list_wishlists():
     """
     List all the wishlists
-    """    
+    """
     app.logger.info("Request for listing all the wishlists")
     wishlists = Wishlist.all()
     results = [wishlist.serialize() for wishlist in wishlists]
     app.logger.info("Returning %d wishlists", len(results))
     return jsonify(results), status.HTTP_200_OK
+
 
 # Add Wishlist
 @app.route("/wishlists", methods=["POST"])
@@ -89,10 +91,10 @@ def create_wishlist():
 
     app.logger.info("Wishlist with ID [%s] created.", wishlist.id)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    
+
 
 # Update Wishlist
-@app.route("/wishlists/<wishlist_id>", methods = ["PUT"])
+@app.route("/wishlists/<wishlist_id>", methods=["PUT"])
 def update_wishlist(wishlist_id):
     """ Update a wishlist"""
     app.logger.info(f"Request to update wishlist {wishlist_id}")
@@ -111,6 +113,7 @@ def update_wishlist(wishlist_id):
     wishlist.update()
 
     return wishlist.serialize(), status.HTTP_200_OK
+
 
 # Update Item
 @app.route("/wishlists/<int:wishlist_id>/items/<int:item_id>", methods=["PUT"])
@@ -177,6 +180,7 @@ def create_item(wishlist_id):
 
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
+
 # delete Wishlist
 @app.route("/wishlists/<int:wishlist_id>", methods=["DELETE"])
 def delete_wishlist(wishlist_id):
@@ -190,6 +194,7 @@ def delete_wishlist(wishlist_id):
         wishlist.delete()
         app.logger.info("Wishlist with ID [%s] delete complete.", wishlist.id)
     return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 # delete Item from Wishlist
 @app.route("/wishlists/<int:wishlist_id>/items/<int:item_id>", methods=["DELETE"])
@@ -213,14 +218,12 @@ def delete_item(wishlist_id, item_id):
         )
     if wishlist_id != item.wishlist_id:
         abort(
-            status.HTTP_404_NOT_FOUND, 
+            status.HTTP_404_NOT_FOUND,
             f"Wishlist with id '{wishlist_id}' do not have it with id '{item_id}'"
         )
     item.delete()
     app.logger.info("Item with ID [%s] deleted from wishlist with ID [%s]", item_id, wishlist_id)
     return "", status.HTTP_204_NO_CONTENT
-
-
 
 
 ######################################################################
@@ -245,4 +248,3 @@ def check_content_type(content_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
-
