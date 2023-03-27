@@ -214,7 +214,7 @@ class Item(db.Model):
                 "wishlist_id": self.wishlist_id,
                 "item_quantity": self.item_quantity}
 
-    def deserialize(self, data):
+    def deserialize(self, data):  # noqa: max-complexity: 13
         """
         Deserializes an Item from a dictionary
 
