@@ -4,8 +4,8 @@ Models for Wishlist and Item
 All of the models are stored in this module
 """
 import logging
-from flask_sqlalchemy import SQLAlchemy
 import datetime
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
 logger = logging.getLogger("flask.app")
@@ -69,17 +69,17 @@ class Wishlist(db.Model):
 
     def serialize(self):
         """ Serializes a Wishlist into a dictionary """
-        items=[]
+        items = []
         for item in self.wishlist_items:
             items.append(Item.serialize(item))
         return {
-            "id": self.id,    
-            "name": self.name,    
-            "owner_id": self.owner_id, 
-            "created_at": self.created_at,   
-            "wishlist_items": items                        
+            "id": self.id,
+            "name": self.name,
+            "owner_id": self.owner_id,
+            "created_at": self.created_at,
+            "wishlist_items": items
         }
-        
+
     def deserialize(self, data):
         """
         Deserializes a Wishlist from a dictionary
@@ -89,14 +89,14 @@ class Wishlist(db.Model):
         """
         try:
 
-            self.name = data["name"]            
+            self.name = data["name"]
             if isinstance(data["owner_id"], int):
-                self.owner_id = data["owner_id"]                
+                self.owner_id = data["owner_id"]
             else:
                 raise DataValidationError(
                     "Invalid type for integer [owner_id]: "
-                    + str(type(data["owner_id"])))            
-            if "wishlist_items" in data:                            
+                    + str(type(data["owner_id"])))
+            if "wishlist_items" in data:
                 for item in data["wishlist_items"]:
                     self.wishlist_items.append(Item().deserialize(item))
 
@@ -132,10 +132,10 @@ class Wishlist(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, id):
+    def find(cls, wishlist_id):
         """ Finds a Wishlist by it's ID """
-        logger.info("Processing lookup for id %s ...", id)
-        return cls.query.get(id)
+        logger.info("Processing lookup for id %s ...", wishlist_id)
+        return cls.query.get(wishlist_id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -157,10 +157,10 @@ class Wishlist(db.Model):
         return cls.query.filter(cls.owner_id == owner_id)
 
     @classmethod
-    def find_or_404(cls, id):
+    def find_or_404(cls, wishlist_id):
         """ Finds a wishlist item by it's ID """
-        logger.info("Processing lookup or 404 for id %s ...", id)
-        return cls.query.get_or_404(id)
+        logger.info("Processing lookup or 404 for id %s ...", wishlist_id)
+        return cls.query.get_or_404(wishlist_id)
 
 
 class Item(db.Model):
@@ -222,53 +222,16 @@ class Item(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
+            if not isinstance(data["product_id"], int) \
+                or not isinstance(data["item_quantity"], int) \
+                    or not isinstance(data["wishlist_id"], int):
+                raise DataValidationError("Invalid type for data-field")
 
-            # 1. Check product_id type.
-            if isinstance(data["product_id"], int):
-                self.product_id = data["product_id"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for integer [product_id]: "
-                    + str(type(data["product_id"])))
-
-            if isinstance(data["product_name"], str):
-                self.product_name = data["product_name"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for string [product_name]: " + str(type(data["product_name"])))
-
-            # 3. Check if a wishlist with that wishlist_id exists.
-            if isinstance(data["wishlist_id"], int):
-                target_wishlist = Wishlist.find(data["wishlist_id"])
-
-                # Wishlist does not exist
-                if not target_wishlist:
-                    raise DataValidationError(
-                        "Wishlist {0} doesn't exist!".format(data["wishlist_id"])
-                    )
-
-                self.wishlist_id = data["wishlist_id"]
-
-            else:
-                raise DataValidationError(
-                    "Invalid type for integer [wishlist_id]: " + str(type(data["wishlist_id"]))
-                )
-
-            # 4. Check that quantity is present and is None.
-            if data.get("item_quantity", None):
-                if isinstance(data["item_quantity"], int):
-                    self.item_quantity = data["item_quantity"]
-                else:
-                    raise DataValidationError(
-                        "Invalid type for integer [item_quantity]: " + str(type(data["item_quantity"]))
-                    )
-                
-            #5. Check if id is present
-            if data.get("id", None):
-                if isinstance(data["id"], int):
-                    self.id = data["id"]
-                else:
-                    self.id=None
+            self.product_id = data["product_id"]
+            self.product_name = data["product_name"]
+            self.wishlist_id = data["wishlist_id"]
+            self.item_quantity = data["item_quantity"]
+            self.id = data["id"]
 
         except KeyError as error:
             raise DataValidationError(
@@ -302,10 +265,10 @@ class Item(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, id):
+    def find(cls, item_id):
         """ Finds an Item by it's ID """
-        logger.info("Processing lookup for id %s ...", id)
-        return cls.query.get(id)
+        logger.info("Processing lookup for id %s ...", item_id)
+        return cls.query.get(item_id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -322,7 +285,7 @@ class Item(db.Model):
         """Returns all Item with the given wishlist id"""
         logger.info("Processing owner id query for %s ...", str(wishlist_id))
         return cls.query.filter(cls.wishlist_id == wishlist_id)
-    
+
     @classmethod
     def find_by_wishlist_and_item_id(cls, wishlist_id, item_id):
         """Returns the Item with the given item id and wishlist id"""
@@ -333,7 +296,7 @@ class Item(db.Model):
         return None
 
     @classmethod
-    def find_or_404(cls, id):
+    def find_or_404(cls, item_id):
         """ Finds an Item item by it's ID """
-        logger.info("Processing lookup or 404 for id %s ...", id)
-        return cls.query.get_or_404(id)
+        logger.info("Processing lookup or 404 for id %s ...", item_id)
+        return cls.query.get_or_404(item_id)

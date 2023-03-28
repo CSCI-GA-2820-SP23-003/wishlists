@@ -8,9 +8,8 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
 from service import app
-from service.models import db, Item, Wishlist
+from service.models import db
 from service.common import status  # HTTP Status Codes
 from tests.factories import WishlistsFactory, ItemsFactory
 
@@ -28,6 +27,7 @@ BASE_URL = "/wishlists"
 
 
 class TestWishlistService(TestCase):
+    # pylint: disable=too-many-public-methods
     """ REST API Server Tests """
 
     @classmethod
@@ -76,7 +76,7 @@ class TestWishlistService(TestCase):
     def test_index(self):
         """ It should call the home page """
         resp = self.app.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)    
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_get_wishlist_not_found(self):
         """It should not Read a Wishlist thats not found"""
@@ -126,7 +126,7 @@ class TestWishlistService(TestCase):
         self.assertEqual(new_wishlist["id"], 1)
         self.assertEqual(new_wishlist["name"], test_wishlist.name)
         self.assertEqual(new_wishlist["owner_id"], test_wishlist.owner_id)
-    
+
     def test_create_wishlists_with_no_data(self):
         """It should not Create an Wishlist with missing data"""
         response = self.app.post(BASE_URL, json={})
@@ -161,61 +161,7 @@ class TestWishlistService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         # make sure the wishlist is deleted
         response = self.app.get(f"{BASE_URL}/{wishlist.id}/items")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)        
-
-######################################################################
-#  T E S T   ITEMS   S E R V I C E
-######################################################################
-class TestItemService(TestCase):
-    """ REST API Server Tests """
-
-    @classmethod
-    def setUpClass(cls):
-        """ This runs once before the entire test suite """
-        app.config["TESTING"] = True
-        app.config["DEBUG"] = False
-        # Set up the test database
-        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)
-
-    @classmethod
-    def tearDownClass(cls):
-        """ This runs once after the entire test suite """
-        db.session.close()
-
-    def setUp(self):
-        """ This runs before each test """
-        self.app = app.test_client()
-        db.drop_all()
-        db.create_all()
-        db.session.commit()
-
-    def tearDown(self):
-        """ This runs after each test """
-        db.session.remove()
-
-    def __create_wishlists(self, count):
-        """Factory method to create wishlists in bulk"""
-        wishlists = []
-        for _ in range(count):
-            test_wishlist = WishlistsFactory()
-            response = self.app.post(BASE_URL, json=test_wishlist.serialize())
-            self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test wishlist"
-            )
-            new_wishlist = response.get_json()
-            test_wishlist.id = new_wishlist["id"]
-            wishlists.append(test_wishlist)
-        return wishlists
-
-    ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
-    ######################################################################
-
-    def test_index(self):
-        """ It should call the home page """
-        resp = self.app.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_add_item(self):
         """It should Add an item to a wishlist"""
@@ -250,17 +196,14 @@ class TestItemService(TestCase):
         """It should Get a list of Items"""
         wishlist = self.__create_wishlists(1)[0]
         item_list = ItemsFactory.create_batch(2)
-        
         item_one_response = self.app.post(
             f"{BASE_URL}/{wishlist.id}/items", json=item_list[0].serialize(), content_type="application/json"
         )
         self.assertEqual(item_one_response.status_code, status.HTTP_201_CREATED)
-        
         item_two_response = self.app.post(
             f"{BASE_URL}/{wishlist.id}/items", json=item_list[1].serialize(), content_type="application/json"
         )
         self.assertEqual(item_two_response.status_code, status.HTTP_201_CREATED)
-        
         resp = self.app.get(f"{BASE_URL}/{wishlist.id}/items", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -283,7 +226,7 @@ class TestItemService(TestCase):
         # make sure item exists before delete
         response = self.app.get(f"{BASE_URL}/{wishlist.id}/items", content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        items = response.get_json()[0]        
+        items = response.get_json()[0]
         self.assertEqual(items['id'], item_id)
 
         # delete the item
@@ -308,7 +251,6 @@ class TestItemService(TestCase):
         """It should Update an item"""
         wishlist = self.__create_wishlists(1)[0]
         item = ItemsFactory()
-    
         # add item
         resp = self.app.post(
             f"{BASE_URL}/{wishlist.id}/items",
@@ -316,7 +258,6 @@ class TestItemService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-    
         data = resp.get_json()
         item.id = data["id"]
         self.assertIsNotNone(data["id"])
@@ -324,7 +265,6 @@ class TestItemService(TestCase):
         self.assertEqual(data["product_id"], item.product_id)
         self.assertEqual(data["item_quantity"], item.item_quantity)
         self.assertEqual(data["product_name"], item.product_name)
-    
         # update item wishlist id
         updated_item = ItemsFactory()
         updated_item.wishlist_id = item.wishlist_id
@@ -335,20 +275,17 @@ class TestItemService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    
         resp_item = resp.get_json()
         self.assertIsNotNone(resp_item["id"])
         self.assertEqual(resp_item["wishlist_id"], wishlist.id)
         self.assertEqual(resp_item["product_id"], updated_item.product_id)
         self.assertEqual(resp_item["item_quantity"], updated_item.item_quantity)
         self.assertEqual(resp_item["product_name"], updated_item.product_name)
-    
+
     def test_update_item_not_found(self):
         """It should not Update an item given wrong wishlist id and non-existent item"""
         wishlist = self.__create_wishlists(1)[0]
-        
         item_id = 4
-
         # update non-existent item id
         item = ItemsFactory()
         response = self.app.put(
