@@ -4,8 +4,8 @@ Models for Wishlist and Item
 All of the models are stored in this module
 """
 import logging
-from flask_sqlalchemy import SQLAlchemy
 import datetime
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
 logger = logging.getLogger("flask.app")
@@ -214,7 +214,7 @@ class Item(db.Model):
                 "wishlist_id": self.wishlist_id,
                 "item_quantity": self.item_quantity}
 
-    def deserialize(self, data):  # noqa: max-complexity: 13
+    def deserialize(self, data):
         """
         Deserializes an Item from a dictionary
 
@@ -222,53 +222,16 @@ class Item(db.Model):
             data (dict): A dictionary containing the resource data
         """
         try:
+            if not isinstance(data["product_id"], int) \
+                or not isinstance(data["item_quantity"], int) \
+                    or not isinstance(data["wishlist_id"], int):
+                raise DataValidationError("Invalid type for data-field")
 
-            # 1. Check product_id type.
-            if isinstance(data["product_id"], int):
-                self.product_id = data["product_id"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for integer [product_id]: "
-                    + str(type(data["product_id"])))
-
-            if isinstance(data["product_name"], str):
-                self.product_name = data["product_name"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for string [product_name]: " + str(type(data["product_name"])))
-
-            # 3. Check if a wishlist with that wishlist_id exists.
-            if isinstance(data["wishlist_id"], int):
-                target_wishlist = Wishlist.find(data["wishlist_id"])
-
-                # Wishlist does not exist
-                if not target_wishlist:
-                    raise DataValidationError(
-                        "Wishlist {0} doesn't exist!".format(data["wishlist_id"])
-                    )
-
-                self.wishlist_id = data["wishlist_id"]
-
-            else:
-                raise DataValidationError(
-                    "Invalid type for integer [wishlist_id]: " + str(type(data["wishlist_id"]))
-                )
-
-            # 4. Check that quantity is present and is None.
-            if data.get("item_quantity", None):
-                if isinstance(data["item_quantity"], int):
-                    self.item_quantity = data["item_quantity"]
-                else:
-                    raise DataValidationError(
-                        "Invalid type for integer [item_quantity]: " + str(type(data["item_quantity"]))
-                    )
-
-            # 5. Check if id is present
-            if data.get("id", None):
-                if isinstance(data["id"], int):
-                    self.id = data["id"]
-                else:
-                    self.id = None
+            self.product_id = data["product_id"]
+            self.product_name = data["product_name"]
+            self.wishlist_id = data["wishlist_id"]
+            self.item_quantity = data["item_quantity"]
+            self.id = data["id"]
 
         except KeyError as error:
             raise DataValidationError(

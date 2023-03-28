@@ -277,7 +277,7 @@ class TestItemsModel(unittest.TestCase):
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_wishlist_id(self):
-        """It should not deserialize a bad customer_id attribute"""
+        """It should not deserialize a bad wishlist_id attribute"""
 
         # Create an Item in the Wishlist.
         test_item = ItemsFactory()
@@ -289,7 +289,7 @@ class TestItemsModel(unittest.TestCase):
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_product_id(self):
-        """It should not deserialize a bad customer_id attribute"""
+        """It should not deserialize a bad product_id attribute"""
 
         # Create a wishlist, and an Item in the Wishlist.
         wishlist = WishlistsFactory()
@@ -304,7 +304,7 @@ class TestItemsModel(unittest.TestCase):
         self.assertRaises(DataValidationError, item.deserialize, data)
 
     def test_deserialize_bad_item_quantity(self):
-        """It should not deserialize a bad customer_id attribute"""
+        """It should not deserialize a bad item_quantity attribute"""
 
         # Create a wishlist, and an Item in the Wishlist.
         wishlist = WishlistsFactory()
