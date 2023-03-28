@@ -132,10 +132,10 @@ class Wishlist(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, id):
+    def find(cls, wishlist_id):
         """ Finds a Wishlist by it's ID """
-        logger.info("Processing lookup for id %s ...", id)
-        return cls.query.get(id)
+        logger.info("Processing lookup for id %s ...", wishlist_id)
+        return cls.query.get(wishlist_id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -157,10 +157,10 @@ class Wishlist(db.Model):
         return cls.query.filter(cls.owner_id == owner_id)
 
     @classmethod
-    def find_or_404(cls, id):
+    def find_or_404(cls, wishlist_id):
         """ Finds a wishlist item by it's ID """
-        logger.info("Processing lookup or 404 for id %s ...", id)
-        return cls.query.get_or_404(id)
+        logger.info("Processing lookup or 404 for id %s ...", wishlist_id)
+        return cls.query.get_or_404(wishlist_id)
 
 
 class Item(db.Model):
@@ -265,10 +265,10 @@ class Item(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, id):
+    def find(cls, item_id):
         """ Finds an Item by it's ID """
-        logger.info("Processing lookup for id %s ...", id)
-        return cls.query.get(id)
+        logger.info("Processing lookup for id %s ...", item_id)
+        return cls.query.get(item_id)
 
     @classmethod
     def find_by_name(cls, name):
@@ -296,7 +296,7 @@ class Item(db.Model):
         return None
 
     @classmethod
-    def find_or_404(cls, id):
+    def find_or_404(cls, item_id):
         """ Finds an Item item by it's ID """
-        logger.info("Processing lookup or 404 for id %s ...", id)
-        return cls.query.get_or_404(id)
+        logger.info("Processing lookup or 404 for id %s ...", item_id)
+        return cls.query.get_or_404(item_id)

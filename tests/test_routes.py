@@ -27,6 +27,7 @@ BASE_URL = "/wishlists"
 
 
 class TestWishlistService(TestCase):
+    # pylint: disable=too-many-public-methods
     """ REST API Server Tests """
 
     @classmethod
@@ -161,62 +162,6 @@ class TestWishlistService(TestCase):
         # make sure the wishlist is deleted
         response = self.app.get(f"{BASE_URL}/{wishlist.id}/items")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-######################################################################
-#  T E S T   ITEMS   S E R V I C E
-######################################################################
-
-
-class TestItemService(TestCase):
-    """ REST API Server Tests """
-
-    @classmethod
-    def setUpClass(cls):
-        """ This runs once before the entire test suite """
-        app.config["TESTING"] = True
-        app.config["DEBUG"] = False
-        # Set up the test database
-        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
-        app.logger.setLevel(logging.CRITICAL)
-
-    @classmethod
-    def tearDownClass(cls):
-        """ This runs once after the entire test suite """
-        db.session.close()
-
-    def setUp(self):
-        """ This runs before each test """
-        self.app = app.test_client()
-        db.drop_all()
-        db.create_all()
-        db.session.commit()
-
-    def tearDown(self):
-        """ This runs after each test """
-        db.session.remove()
-
-    def __create_wishlists(self, count):
-        """Factory method to create wishlists in bulk"""
-        wishlists = []
-        for _ in range(count):
-            test_wishlist = WishlistsFactory()
-            response = self.app.post(BASE_URL, json=test_wishlist.serialize())
-            self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test wishlist"
-            )
-            new_wishlist = response.get_json()
-            test_wishlist.id = new_wishlist["id"]
-            wishlists.append(test_wishlist)
-        return wishlists
-
-    ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
-    ######################################################################
-
-    def test_index(self):
-        """ It should call the home page """
-        resp = self.app.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_add_item(self):
         """It should Add an item to a wishlist"""
