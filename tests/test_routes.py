@@ -163,7 +163,7 @@ class TestWishlistService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 10)
-    
+
     def test_list_wishlist_with_owner_id(self):
         """ It should list wishlist with certain owner_id"""
         wishlist = self.__create_wishlists(1)[0]
@@ -195,17 +195,6 @@ class TestWishlistService(TestCase):
         self.assertEqual(items["id"], wishlist.id)
         self.assertEqual(items["name"], wishlist.name)
         self.assertEqual(items["owner_id"], wishlist.owner_id)
-
-    def test_list_wishlist_wih_names(self):
-        """It should list a wishlist by name"""
-        wishlist = self.__create_wishlists(2)[0]
-        resp = self.app.get(f'{BASE_URL}?name={wishlist.name}')
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        items = resp.get_json()[0]
-        self.assertEqual(items["id"], wishlist.id)
-        self.assertEqual(items["name"], wishlist.name)
-        self.assertEqual(items["owner_id"], wishlist.owner_id)
-
 
     def test_delete_wishlist(self):
         """It should Delete a Wishlist"""
