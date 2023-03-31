@@ -70,6 +70,8 @@ Route | Operation | Description
 -- | -- | --
 /healthcheck | | Service Healthcheck
 / | root index | Root URL returns service name
+GET /wishlists/`<wishlist_id>` | READ | Reads a single wishlist with given ID
+GET /wishlists/`<wishlist_id>`/items/`<item_id>` | READ | Read an item from a wishlist
 GET /wishlists/`<wishlist_id>`/items | LIST | List items in a wishlist
 GET /wishlists | LIST | Show all wishlists
 POST /wishlists | CREATE | Create new Wishlist
