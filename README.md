@@ -32,8 +32,6 @@ run command as follow in command line
 nosetests
 ```
 
-Current coverage is 95%
-
 ## Contents
 
 The project contains the following:
@@ -61,8 +59,7 @@ service/                     - service python package
 tests/                       - test cases package
 ├── __init__.py              - package initializer
 ├── factories.py             - test factory to make testing objects
-├── test_items_model.py      - test suite for item models
-├── test_wishlists_models.py - test suite for wishlist models
+├── test_models.py           - test suite for models
 ├── test_cli_commands.py     - test suite for cli commands
 └── test_routes.py           - test suite for service routes
 ```
@@ -73,7 +70,9 @@ Route | Operation | Description
 -- | -- | --
 /healthcheck | | Service Healthcheck
 / | root index | Root URL returns service name
-GET /wishlists/`<wishlist_id>` | READ | Show a single wishlist
+GET /wishlists/`<wishlist_id>` | READ | Reads a single wishlist with given ID
+GET /wishlists/`<wishlist_id>`/items/`<item_id>` | READ | Read an item from a wishlist
+GET /wishlists/`<wishlist_id>`/items | LIST | List items in a wishlist
 GET /wishlists | LIST | Show all wishlists
 POST /wishlists | CREATE | Create new Wishlist
 PUT /wishlists/`<wishlist_id>` | UPDATE | Update wishlist
