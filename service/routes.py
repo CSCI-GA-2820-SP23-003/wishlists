@@ -108,9 +108,20 @@ def list_wishlists():
     """
     List all the wishlists
     """
-    app.logger.info("Request for listing all the wishlists")
-    wishlists = Wishlist.all()
-    results = [wishlist.serialize() for wishlist in wishlists]
+    app.logger.info("Request for listing the wishlists")
+    wishlist_id = request.args.get("id")
+    name = request.args.get("name")
+    owner_id = request.args.get("owner_id")
+    wishlist_results = []
+    if wishlist_id:
+        wishlist_results.append(Wishlist.find(wishlist_id))
+    elif name:
+        wishlist_results = Wishlist.find_by_name(name)
+    elif owner_id:
+        wishlist_results = Wishlist.find_by_owner_id(owner_id)
+    else:
+        wishlist_results = Wishlist.all()
+    results = [wishlist.serialize() for wishlist in wishlist_results]
     app.logger.info("Returning %d wishlists", len(results))
     return jsonify(results), status.HTTP_200_OK
 
