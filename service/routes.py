@@ -111,7 +111,7 @@ def list_wishlists():
     app.logger.info("Request for listing the wishlists")
     wishlist_id = request.args.get("id")
     name = request.args.get("name")
-    owner_id = request.args.get("ownder_id")
+    owner_id = request.args.get("owner_id")
     wishlist_results = []
     if wishlist_id:
         wishlist_results.append(Wishlist.find(wishlist_id))
