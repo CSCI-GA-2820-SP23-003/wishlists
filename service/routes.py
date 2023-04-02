@@ -277,6 +277,7 @@ def delete_item(wishlist_id, item_id):
     app.logger.info("Item with ID [%s] deleted from wishlist with ID [%s]", item_id, wishlist_id)
     return "", status.HTTP_204_NO_CONTENT
 
+
 # clear items from existing wishlist
 @app.route("/wishlists/<int:wishlist_id>/clear", methods=["PUT"])
 def clear_wishlist(wishlist_id):
