@@ -80,6 +80,7 @@ PUT /wishlists/`<wishlist_id>`/items/`<item_id>` | UPDATE | Update item from Wis
 POST /wishlists/`<wishlist_id>`/items | CREATE | Add item to wishlist
 DELETE /wishlists/`<wishlist_id>` | DELETE | Delete given Wishlist
 DELETE /wishlists/`<wishlist_id>`/items/`<item_id>` | DELETE | Delete item from Wishlist
+PUT /wishlists/`<wishlist_id>`/clear | ACTION | Delete all items from an existing wishlist without deleting the wishlist itself
 
 ## License
 

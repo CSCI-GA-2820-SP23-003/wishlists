@@ -463,3 +463,51 @@ class TestWishlistService(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
         self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{updated_item.wishlist_id}' was not found.")
+
+    def test_clear_items_of_wishlist(self):
+        """It should clear the existing wishlist and make wishlist empty"""
+        wishlist = self.__create_wishlists(1)[0]
+
+        # create a wishlist
+        resp = self.app.post(
+            f"{BASE_URL}",
+            json=wishlist.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        item = ItemsFactory()
+        item.wishlist_id = wishlist.id
+
+        # add item to the wishlist
+        resp = self.app.post(
+            f"{BASE_URL}/{wishlist.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # retrieve the wishlist
+        resp = self.app.get(
+            f"{BASE_URL}/{wishlist.id}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK, resp.data)
+        data = resp.get_json()
+
+        # make sure wishlist is non empty
+        self.assertEqual(len(data['wishlist_items']), 1)
+        resp = self.app.put(
+            f"{BASE_URL}/4/clear",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # clear the wishlist and make wishlist empty
+        resp = self.app.put(
+            f"{BASE_URL}/{wishlist.id}/clear",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        # check if wishlist is empty or not
+        self.assertEqual(len(data['wishlist_items']), 0)

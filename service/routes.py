@@ -278,6 +278,31 @@ def delete_item(wishlist_id, item_id):
     return "", status.HTTP_204_NO_CONTENT
 
 
+# clear items from existing wishlist
+@app.route("/wishlists/<int:wishlist_id>/clear", methods=["PUT"])
+def clear_wishlist(wishlist_id):
+    """
+    Clear a wishlist
+    This endpoint will clear a Wishlist Items in the Wishlist
+    """
+
+    # See if the wishlist exists and abort if it doesn't
+    wishlist = Wishlist.find(wishlist_id)
+    if not wishlist:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Wishlist with id '{wishlist_id}' could not be found.",
+        )
+
+    wishlist_data = wishlist.serialize()
+    for items in wishlist_data["wishlist_items"]:
+        Item.find(items["id"]).delete()
+    wishlist_data["wishlist_items"] = []
+    wishlist.deserialize(wishlist_data)
+    wishlist.update()
+
+    return make_response(jsonify(wishlist.serialize()), status.HTTP_200_OK)
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
