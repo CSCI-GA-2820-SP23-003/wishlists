@@ -78,6 +78,13 @@ class TestWishlistService(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_health(self):
+        """It should test health endpoint"""
+        resp = self.app.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["message"], "Healthy")
+
     def test_get_wishlist(self):
         """It should Read a single Wishlist"""
 

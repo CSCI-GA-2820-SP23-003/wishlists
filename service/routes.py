@@ -15,8 +15,8 @@ from . import app
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
-@app.route("/healthcheck")
-def healthcheck():
+@app.route("/health")
+def health():
     """Let them know our heart is still beating"""
     return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
 
