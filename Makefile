@@ -1,5 +1,11 @@
 # These can be overidden with env vars.
-CLUSTER ?= nyu-devops
+REGISTRY ?= us.icr.io
+NAMESPACE ?= saksham
+IMAGE_NAME ?= wishlists
+IMAGE_TAG ?= 2.0
+IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
+PLATFORM ?= "linux/amd64"
+CLUSTER ?= nyu-devops-wishlists
 
 .PHONY: help
 help: ## Display this help
@@ -9,9 +15,11 @@ help: ## Display this help
 all: help
 
 .PHONY: clean
-clean:	## Removes all dangling docker images
-	$(info Removing all dangling docker images..)
+clean:	## Removes all dangling build cache
+	$(info Removing all dangling build cache..)
+	-docker rmi $(IMAGE)
 	docker image prune -f
+	docker buildx prune -f
 
 .PHONY: venv
 venv: ## Create a Python virtual environment
@@ -51,6 +59,12 @@ cluster-rm: ## Remove a K3D Kubernetes cluster
 	$(info Removing Kubernetes cluster...)
 	k3d cluster delete
 
+############################################################
+# COMMANDS FOR DEPLOYING THE IMAGE
+############################################################
+
+##@ Deployment
+
 .PHONY: login
 login: ## Login to IBM Cloud using yur api key
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
@@ -60,8 +74,36 @@ login: ## Login to IBM Cloud using yur api key
 	ibmcloud ks workers --cluster $(CLUSTER)
 	kubectl cluster-info
 
+.PHONY: push
+image-push: ## Push to a Docker image registry
+	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
+	docker push $(IMAGE)
+
 .PHONY: deploy
 depoy: ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
 	kubectl apply -f deploy/
 
+############################################################
+# COMMANDS FOR BUILDING THE IMAGE
+############################################################
+
+##@ Docker Build
+
+.PHONY: init
+init: export DOCKER_BUILDKIT=1
+init:	## Creates the buildx instance
+	$(info Initializing Builder...)
+	docker buildx create --use --name=qemu
+	docker buildx inspect --bootstrap
+
+.PHONY: build
+build:	## Build all of the project Docker images
+	$(info Building $(IMAGE) for $(PLATFORM)...)
+	docker buildx build --file Dockerfile  --pull --platform=$(PLATFORM) --tag $(IMAGE) --load .
+
+.PHONY: remove
+remove:	## Stop and remove the buildx builder
+	$(info Stopping and removing the builder image...)
+	docker buildx stop
+	docker buildx rm
