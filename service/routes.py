@@ -89,17 +89,21 @@ def get_item(wishlist_id, item_id):
 def list_wishlist_items(wishlist_id):
     """
     Retrieve a single Wishlist
-    This endpoint will return a Wishlist based on it's id
+    This endpoint will return a Wishlist based on it's id or return a certain id with query
     """
 
     app.logger.info("Request for Wishlist with id: %s", wishlist_id)
-    wishlist = Wishlist.find(wishlist_id)
-    if not wishlist:
+    item_name = request.args.get("name")
+    if not Wishlist.find(wishlist_id):
         abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
+    if item_name:
+        items = Item.find_by_name(item_name)
+    else:
+        items = Item.find_by_wishlist_id(wishlist_id)
 
-    items = [item.serialize() for item in wishlist.wishlist_items]
-    app.logger.info("Returning %d items", len(items))
-    return jsonify(items), status.HTTP_200_OK
+    items_list = [item.serialize() for item in items]
+    app.logger.info("Returning %d items", len(items_list))
+    return jsonify(items_list), status.HTTP_200_OK
 
 
 # LIST wishlist

@@ -342,6 +342,17 @@ class TestWishlistService(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 2)
 
+    def test_get_item_by_name(self):
+        """It should Get a item by the item name"""
+        wishlist = self.__create_wishlists(1)[0]
+        item = ItemsFactory.create()
+        self.app.post(
+            f"{BASE_URL}/{wishlist.id}/items", json=item.serialize(),
+            content_type="application/json"
+        )
+        resp = self.app.get(f"{BASE_URL}/{wishlist.id}/items?name={item.product_name}", content_type="application/json")
+        self.assertEqual(resp.get_json()[0]["product_name"], item.product_name)
+
     def test_get_items_list_no_wishlist_id(self):
         """It should not Get a list of Items when a wishlist is not found"""
         response = self.app.get(f"{BASE_URL}/0/items", content_type="application/json")

@@ -81,7 +81,8 @@ POST /wishlists/`<wishlist_id>`/items | CREATE | Add item to wishlist
 DELETE /wishlists/`<wishlist_id>` | DELETE | Delete given Wishlist
 DELETE /wishlists/`<wishlist_id>`/items/`<item_id>` | DELETE | Delete item from Wishlist
 PUT /wishlists/`<wishlist_id>`/clear | ACTION | Delete all items from an existing wishlist without deleting the wishlist itself
-
+GET /wishlists?q=querytext | QUERY | Search for a wishlist with given query
+GET /wishlists/`<id>`?q=querytext | QUERY | Search for items in wishlist with certain query
 ## License
 
 Copyright (c) John Rofrano. All rights reserved.
