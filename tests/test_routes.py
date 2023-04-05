@@ -205,7 +205,6 @@ class TestWishlistService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         # make sure the wishlist is deleted
         response = self.app.get(f"{BASE_URL}/{wishlist.id}/items")
-        print(response.get_json())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     ######################################################################
