@@ -13,7 +13,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-ID_PREFIX = 'wishlist_'
 
 @when('I visit the "home page"')
 def step_impl(context):
@@ -35,14 +34,14 @@ def step_impl(context, text_string):
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    element_id =  element_name.lower().replace(' ', '_')
     element = context.driver.find_element_by_id(element_id)
     element.clear()
     element.send_keys(text_string)
 
 @then('the "{element_name}" field should be empty')
 def step_impl(context, element_name):
-    element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    element_id =  element_name.lower().replace(' ', '_')
     element = context.driver.find_element_by_id(element_id)
     expect(element.get_attribute('value')).to_be(u'')
 
@@ -51,7 +50,7 @@ def step_impl(context, element_name):
 ##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
-    element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
+    element_id =  element_name.lower().replace(' ', '_')
     element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )

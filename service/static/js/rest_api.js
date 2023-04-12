@@ -15,7 +15,7 @@ $(function () {
     function clear_form_data() {
         $("#wishlist_id").val("");
         $("#wishlist_name").val("");
-        $("#wishlist_owner_id").val("");
+        $("#owner_id").val("");
     }
 
     // Updates the flash message area
@@ -31,7 +31,7 @@ $(function () {
     $("#create-btn").click(function () {
 
         let name = $("#wishlist_name").val();
-        let owner_id = $("#wishlist_owner_id").val();
+        let owner_id = $("#owner_id").val();
 
         let data = {
             "name": name,

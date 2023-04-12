@@ -7,8 +7,8 @@ Background:
     Given the following wishlists
         | name              | owner_id  |
         | Gift Ideas        | 3         |
-        | Dream Items       | 3         |
-        | Shopping List     | 4         |
+        | Dream Items       | 4         |
+        | Shopping List     | 3         |
         | Save for Later    | 5         |
 
 Scenario: The server is running
@@ -18,14 +18,14 @@ Scenario: The server is running
 
 Scenario: Create a Wishlist
     When I visit the "Home Page"
-    And I set the "Name" to "wedding_wishlist"
+    And I set the "Wishlist Name" to "wedding_wishlist"
     And I set the "Owner ID" to "6"
     And I press the "Create" button
     Then I should see the message "Success"
-    When I copy the "ID" field
+    When I copy the "Wishlist ID" field
     And I press the "Clear" button
-    Then the "ID" field should be empty
-    And the "Name" field should be empty
+    Then the "Wishlist ID" field should be empty
+    And the "Wishlist Name" field should be empty
     And the "Owner ID" field should be empty
     # # To-do : When implementing retrieve button
     # When I paste the "Wishlist Id" field
