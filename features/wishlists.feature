@@ -7,9 +7,16 @@ Background:
     Given the following wishlists
         | name              | owner_id  |
         | Gift Ideas        | 3         |
-        | Dream Items       | 4         |
+        | Watch List        | 4         |
         | Shopping List     | 3         |
         | Save for Later    | 5         |
+
+    Given the following wishlist items
+        | name      | wishlist_name | product_id    | quantity  |
+        | Watch     | Gift Ideas    | 3             | 5         |
+        | Earphone  | Gift Ideas    | 4             | 2         |
+        | Milk      | Shopping List | 5             | 3         |
+        | Bag       | Watch List    | 6             | 1         |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -28,8 +35,20 @@ Scenario: Create a Wishlist
     And the "Wishlist Name" field should be empty
     And the "Owner ID" field should be empty
     # # To-do : When implementing retrieve button
-    # When I paste the "Wishlist Id" field
-    # And I press the "Retrieve" button
-    # Then I should see the message "Success"
-    # And I should see "wish_5" in the "Wishlist Name" field
-    # And I should see "6" in the "Owner ID" field
+
+# # Scenarios for Wishlist Items
+
+Scenario: Create a Wishlist Item
+    When I visit the "Home Page"
+    And I set the "Wishlist name" to "Save for later"
+    And I set the "Product Name" to "Jeans"
+    And I set the "Product Id" to "85"
+    And I set the "Item Quantity" to "1"
+    And I press the "Create-Item" button
+    Then I should see the message "Success"
+    When I copy the "Item Id" field
+    And I press the "Clear" button
+    Then the "Product Name" field should be empty
+    And the "Product Id" field should be empty
+    And the "Owner Id" field should be empty
+    # To-do : Add implementation for retrieve
