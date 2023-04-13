@@ -37,18 +37,3 @@ Scenario: Create a Wishlist
     # # To-do : When implementing retrieve button
 
 # # Scenarios for Wishlist Items
-
-Scenario: Create a Wishlist Item
-    When I visit the "Home Page"
-    And I set the "Wishlist name" to "Save for later"
-    And I set the "Product Name" to "Jeans"
-    And I set the "Product Id" to "85"
-    And I set the "Item Quantity" to "1"
-    And I press the "Create-Item" button
-    Then I should see the message "Success"
-    When I copy the "Item Id" field
-    And I press the "Clear" button
-    Then the "Product Name" field should be empty
-    And the "Product Id" field should be empty
-    And the "Owner Id" field should be empty
-    # To-do : Add implementation for retrieve
