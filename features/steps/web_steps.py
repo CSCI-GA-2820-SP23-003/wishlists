@@ -88,6 +88,15 @@ def step_impl(context, element_name):
     context.clipboard = element.get_attribute('value')
     logging.info('Clipboard contains: %s', context.clipboard)
 
+@when('I paste the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = element_name.lower().replace(' ', '_')
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
+    element.clear()
+    element.send_keys(context.clipboard)
+
 
 ##################################################################
 # This code works because of the following naming convention:
