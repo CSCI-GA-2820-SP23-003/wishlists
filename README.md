@@ -21,7 +21,7 @@ This project contains the code for Wishlist Service. The service consists of Wis
    2. Run ```flask db migrate``` to migrate the models to db schema.
    3. Run ```flask db upgrade``` to apply  the schema to database.
 4. Run the app by ```flask run```
-5. It's will be host on ```http://localhost:8000```
+5. It's will be host on ```http://localhost:8080```
 
 ## Test
 
