@@ -71,3 +71,18 @@ Scenario: Create a Wishlist Item
     And I set the "Item Quantity" to "5"
     And I press the "Create-Item" button
     Then I should see the message "Success"
+
+Scenario: Search for Wishlist Item with given name
+    When I visit the "Home Page"
+    And I set the "Wishlist name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    When I paste the "Wishlist Id" field
+    And I set the "Product Name" to "Watch"
+    And I press the "Search-Item" button
+    Then I should see the message "Success"
+    And I should see "Watch" in the item results
+    And I should not see "Earphone" in the item results
+    And I should not see "Milk" in the item results
