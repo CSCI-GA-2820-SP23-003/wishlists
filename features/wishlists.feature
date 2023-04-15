@@ -36,6 +36,23 @@ Scenario: Create a Wishlist
     And the "Owner ID" field should be empty
     # # To-do : When implementing retrieve button
 
+Scenario: Search for Wishlist with wishlist name
+    When I visit the "Home Page"
+    And I set the "Wishlist name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the results
+    And I should not see "Save for Later" in the results
+
+Scenario: Search for Wishlist with given Owner ID
+    When I visit the "Home Page"
+    And I set the "Owner Id" to "3"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the results
+    And I should see "Shopping List" in the results
+    And I should not see "Save for Later" in the results
+
 # # Scenarios for Wishlist Items
 
 Scenario: Create a Wishlist Item
