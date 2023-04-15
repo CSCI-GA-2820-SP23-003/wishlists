@@ -36,4 +36,53 @@ Scenario: Create a Wishlist
     And the "Owner ID" field should be empty
     # # To-do : When implementing retrieve button
 
+Scenario: Search for Wishlist with wishlist name
+    When I visit the "Home Page"
+    And I set the "Wishlist name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the results
+    And I should not see "Save for Later" in the results
+
+Scenario: Search for Wishlist with given Owner ID
+    When I visit the "Home Page"
+    And I set the "Owner Id" to "3"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the results
+    And I should see "Shopping List" in the results
+    And I should not see "Save for Later" in the results
+
 # # Scenarios for Wishlist Items
+
+Scenario: Create a Wishlist Item
+    When I visit the "Home Page"
+    And I set the "Owner Id" to "5"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    Then the "Wishlist Id" field should be empty
+    And the "Wishlist Name" field should be empty
+    And the "Owner Id" field should be empty
+    When I paste the "Wishlist Id" field
+    And I set the "Product Name" to "Jeans"
+    And I set the "Product Id" to "9"
+    And I set the "Item Quantity" to "5"
+    And I press the "Create-Item" button
+    Then I should see the message "Success"
+
+Scenario: Search for Wishlist Item with given name
+    When I visit the "Home Page"
+    And I set the "Wishlist name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    When I paste the "Wishlist Id" field
+    And I set the "Product Name" to "Watch"
+    And I press the "Search-Item" button
+    Then I should see the message "Success"
+    And I should see "Watch" in the item results
+    And I should not see "Earphone" in the item results
+    And I should not see "Milk" in the item results
