@@ -88,7 +88,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/api/wishlists/${wishlist_id}`,
+                url: `/wishlists/${wishlist_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -114,7 +114,7 @@ $(function () {
         $("#flash_message").empty();
         let ajax = $.ajax({
             type: "GET",
-            url: `/api/wishlists/${wishlist_id}`,
+            url: `/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: ''
         })
