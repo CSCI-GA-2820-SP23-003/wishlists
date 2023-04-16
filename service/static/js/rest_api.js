@@ -72,6 +72,67 @@ $(function () {
     });
 
     // ****************************************
+    // Update a Wishlist
+    // ****************************************
+
+    $("#update-btn").click(function () {
+
+
+        let wishlist_id = $("#wishlist_id").val();
+        let name = $("#wishlist_name").val();        
+        let data = {
+            "name": name,
+        };
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/api/wishlists/${wishlist_id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            })
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Retrieve a Wishlist
+    // ****************************************
+
+    $("#retrieve-btn").click(function () {
+
+        let wishlist_id = $("#wishlist_id").val();
+        $("#flash_message").empty();
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/api/wishlists/${wishlist_id}`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){            
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+
+    // ****************************************
     // Search for a Wishlist
     // ****************************************
 
@@ -177,7 +238,7 @@ $(function () {
 
     });
 
-    // Buttons for Wishlist Items
+    // ------------------------------------------ Buttons for Wishlist Items ------------------------------------------ 
 
     // ****************************************
     // Add Item to a Wishlist

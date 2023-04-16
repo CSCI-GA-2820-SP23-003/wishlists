@@ -34,11 +34,16 @@ Scenario: Create a Wishlist
     Then the "Wishlist ID" field should be empty
     And the "Wishlist Name" field should be empty
     And the "Owner ID" field should be empty
-    # # To-do : When implementing retrieve button
+    When I paste the "Wishlist ID" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "wedding_wishlist" in the "Wishlist Name" field
+    And I should see "6" in the "Owner ID" field
+
 
 Scenario: Search for Wishlist with wishlist name
     When I visit the "Home Page"
-    And I set the "Wishlist name" to "Gift Ideas"
+    And I set the "Wishlist Name" to "Gift Ideas"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should see "Gift Ideas" in the results
@@ -53,7 +58,29 @@ Scenario: Search for Wishlist with given Owner ID
     And I should see "Shopping List" in the results
     And I should not see "Save for Later" in the results
 
-# # Scenarios for Wishlist Items
+Scenario: Update a Wishlist
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the "Wishlist Name" field
+    And I should see "3" in the "Owner Id" field
+    When I change "Wishlist Name" to "Birthday Ideas"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    And I paste the "Wishlist Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Birthday Ideas" in the "Wishlist Name" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Birthday Ideas" in the results
+    And I should not see "Gift Ideas" in the results
+
+##----------------------------------- Scenarios for Wishlist Items ----------------------------------- 
 
 Scenario: Create a Wishlist Item
     When I visit the "Home Page"
