@@ -86,3 +86,15 @@ Scenario: Search for Wishlist Item with given name
     And I should see "Watch" in the item results
     And I should not see "Earphone" in the item results
     And I should not see "Milk" in the item results
+
+Scenario: Empty a Wishlist
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "3" in the "Owner Id" field
+    When I press the "Empty" button
+    Then I should see the message "Gift Ideas wishlist has been cleared!"
+    When I press the "Search-Item" button
+    Then I should see the message "Success"
+    And I should not see "Earphone" in the item results

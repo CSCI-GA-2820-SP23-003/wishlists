@@ -145,6 +145,38 @@ $(function () {
 
     });
 
+    // ****************************************
+    // Empty a Wishlist
+    // ****************************************
+
+    $("#empty-btn").click(function () {
+
+        let wishlist_id = $("#wishlist_id").val();
+        let wishlist_name = $("#wishlist_name").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/wishlists/${wishlist_id}/clear`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            clear_form_data()
+            $("#wishlist_id").val(`${wishlist_id}`);
+            flash_message(`${wishlist_name} wishlist has been cleared!`)
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
     // Buttons for Wishlist Items
 
     // ****************************************

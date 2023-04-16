@@ -12,7 +12,7 @@ from compare import expect
 @given('the following wishlists')
 def step_impl(context):
     """ Delete all Wishlists and load new ones """
-    # List all of the pets and delete them one by one
+    # List all of the wishlists and delete them one by one
     rest_endpoint = f"{context.BASE_URL}/wishlists"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
