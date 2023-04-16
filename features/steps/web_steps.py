@@ -150,3 +150,13 @@ def step_impl(context, name):
     element = context.driver.find_element_by_id("search_item_results")
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
+
+@then('I should see "{text_string}" in the "{element_name}" field')
+def step_impl(context, text_string, element_name):
+    element_id = element_name.lower().replace(' ', '_')
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element_value(
+            (By.ID, element_id), text_string
+        )
+    )
+    expect(found).to_be(True)
