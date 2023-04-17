@@ -58,6 +58,15 @@ Scenario: Search for Wishlist with given Owner ID
     And I should see "Shopping List" in the results
     And I should not see "Save for Later" in the results
 
+Scenario: List all Wishlists
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the results
+    And I should see "Watch List" in the results
+    And I should see "Shopping List" in the results
+    And I should see "Save for Later" in the results
+
 Scenario: Update a Wishlist
     When I visit the "Home Page"
     And I set the "Wishlist Name" to "Gift Ideas"
@@ -126,7 +135,6 @@ Scenario: Empty a Wishlist
     Then I should see the message "Success"
     And I should not see "Earphone" in the item results
 
-
 Scenario: Update a Wishlist Item
     When I visit the "Home Page"
     And I set the "Wishlist Name" to "Gift Ideas"
@@ -152,3 +160,16 @@ Scenario: Update a Wishlist Item
     Then I should see the message "Success"
     And I should see "Cellphone" in the item results
     And I should not see "Watch" in the item results
+
+Scenario: List all Wishlists Items in a Wishlist
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    When I paste the "Wishlist Id" field
+    And I press the "Search-Item" button
+    Then I should see the message "Success"
+    And I should see "Watch" in the item results
+    And I should see "Earphone" in the item results
