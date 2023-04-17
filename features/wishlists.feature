@@ -125,3 +125,30 @@ Scenario: Empty a Wishlist
     When I press the "Search-Item" button
     Then I should see the message "Success"
     And I should not see "Earphone" in the item results
+
+
+Scenario: Update a Wishlist Item
+    When I visit the "Home Page"
+    And I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    When I paste the "Wishlist Id" field
+    And I set the "Product Name" to "Watch"
+    And I press the "Search-Item" button
+    Then I should see the message "Success" 
+    And I should see "Watch" in the item results
+    When I change "Product Name" to "Cellphone"
+    And I press the "Update-Item" button
+    Then I should see the message "Success"     
+    When I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    When I paste the "Wishlist Id" field
+    And I press the "Search-Item" button
+    Then I should see the message "Success"
+    And I should see "Cellphone" in the item results
+    And I should not see "Watch" in the item results
