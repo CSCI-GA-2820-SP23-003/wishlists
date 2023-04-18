@@ -25,6 +25,7 @@ $(function () {
         $("#wishlist_id").val("");
         $("#wishlist_name").val("");
         $("#owner_id").val("");
+        $("#item_id").val("");
         $("#product_name").val("");
         $("#item_quantity").val("");
         $("#product_id").val("");
@@ -201,6 +202,36 @@ $(function () {
         });
 
         ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Delete a Wishlist
+    // ****************************************
+
+    $("#delete-btn").click(function () {
+
+        let wishlist_id = $("#wishlist_id").val();
+        let wishlist_name = $("#wishlist_name").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/${wishlist_id}`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
             flash_message(res.responseJSON.message)
         });
 
@@ -427,6 +458,36 @@ $(function () {
         });
 
         ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Delete an Item
+    // ****************************************
+
+    $("#delete-item-btn").click(function () {
+
+        let item_id = $("#item_id").val();        
+        let wishlist_id = $("#wishlist_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/wishlists/${wishlist_id}/items/${item_id}`,
+            contentType: "application/json",
+            data: '',
+        });
+
+        ajax.done(function(res){            
+            clear_form_data()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
             flash_message(res.responseJSON.message)
         });
 

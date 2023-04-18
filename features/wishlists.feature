@@ -89,6 +89,30 @@ Scenario: Update a Wishlist
     And I should see "Birthday Ideas" in the results
     And I should not see "Gift Ideas" in the results
 
+Scenario: Delete a Wishlist
+    When I visit the "home Page"
+    And I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the "Wishlist Name" field
+    And I should see "3" in the "Owner Id" field
+    When I press the "Delete" button
+    Then I should see the message "Success"
+    When I press the "Search" button
+    Then I should not see "Gift Ideas" in the results
+    And I should see "Watch List" in the results
+    And I should see "Shopping List" in the results
+    And I should see "Save for Later" in the results
+    And I should see "Watch List" in the "Wishlist Name" field
+    And I should see "4" in the "Owner Id" field
+    When I press the "Delete" button
+    Then I should see the message "Success"
+    When I press the "Search" button
+    Then I should not see "Gift Ideas" in the results
+    And I should not see "Watch List" in the results
+    And I should see "Shopping List" in the results
+    And I should see "Save for Later" in the results
+
 ##----------------------------------- Scenarios for Wishlist Items ----------------------------------- 
 
 Scenario: Create a Wishlist Item
@@ -172,4 +196,28 @@ Scenario: List all Wishlists Items in a Wishlist
     And I press the "Search-Item" button
     Then I should see the message "Success"
     And I should see "Watch" in the item results
+    And I should see "Earphone" in the item results
+
+Scenario: Delete a Wishlist Item
+    When I visit the "home Page"
+    And I set the "Wishlist Name" to "Gift Ideas"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Gift Ideas" in the "Wishlist Name" field
+    And I should see "3" in the "Owner Id" field
+    When I copy the "Wishlist Id" field
+    And I press the "Clear" button
+    When I paste the "Wishlist Id" field
+    And I press the "Search-Item" button
+    Then I should see the message "Success"
+    And I should see "Watch" in the "Product Name" field
+    And I should see "3" in the "Product Id" field
+    And I should see "Watch" in the item results
+    And I should see "Earphone" in the item results
+    When I press the "Delete-Item" button
+    Then I should see the message "Success"
+    When I press the "Search" button
+    Then I should see the message "Success"
+    When I press the "Search-Item" button
+    Then I should not see "Watch" in the item results
     And I should see "Earphone" in the item results
