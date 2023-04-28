@@ -504,4 +504,12 @@ $(function () {
         clear_form_data()
     });
 
+    // ****************************************
+    // Links to swagger api docs
+    // ****************************************
+
+    $("#api-btn").click(function () {
+        window.location.href='/apidocs';
+    });
+
 })
