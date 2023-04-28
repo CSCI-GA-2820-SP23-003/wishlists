@@ -13,7 +13,7 @@ from service.common import log_handlers
 # Create Flask application
 app = Flask(__name__)
 app.config.from_object(config)
-app.url_map.strict_slashes = False
+# app.url_map.strict_slashes = False
 
 ######################################################################
 # Configure Swagger before initializing it
@@ -25,6 +25,7 @@ api = Api(app,
           default='pets',
           default_label='Pet shop operations',
           doc='/apidocs',  # default also could use doc='/apidocs/'
+          prefix='/api',
           )
 
 # Dependencies require we import the routes AFTER the Flask app is created
