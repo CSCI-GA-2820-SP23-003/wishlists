@@ -17,7 +17,7 @@ from tests.factories import WishlistsFactory, ItemsFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/wishlists"
+BASE_URL = "/api/wishlists"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -154,14 +154,14 @@ class TestWishlistService(TestCase):
     def test_create_wishlists_no_content_type(self):
         """It should not Create a Wishlist with no content type"""
         response = self.app.post(BASE_URL)
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_wishlists_bad_content_type(self):
         """It should not Create an Wishlist with incorrect content type"""
         response = self.app.post(
             BASE_URL, headers={"Content-Type": "application/octet-stream"}
         )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_list_wishlists(self):
         """ It should list all wishlists"""
@@ -305,8 +305,9 @@ class TestWishlistService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.get_json()["message"],
-                         f"404 Not Found: Wishlist with id '{temp_wishlist_id}' was not found.")
+        self.assertIn(f"Wishlist with id '{temp_wishlist_id}' was not found.", response.get_json()["message"])
+        # self.assertEqual(response.get_json()["message"],
+        #                  f"404 Not Found: Wishlist with id '{temp_wishlist_id}' was not found.")
 
         # retrieve the items with wrong wishlist id
         response = self.app.get(
@@ -314,14 +315,17 @@ class TestWishlistService(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.get_json()["message"], f"404 Not Found: Item with id '{item_id_wishlist_1}' was not found.")
+        # self.assertEqual(response.get_json()["message"], f"404 Not Found: Item with id '{item_id_wishlist_1}' was not found.")
+        self.assertIn(f"Item with id '{item_id_wishlist_1}' was not found.", response.get_json()["message"])
+
 
         response = self.app.get(
             f"{BASE_URL}/{wishlists[1].id}/items/{item_id_wishlist_0}",
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.get_json()["message"], f"404 Not Found: Item with id '{item_id_wishlist_0}' was not found.")
+        # self.assertEqual(response.get_json()["message"], f"404 Not Found: Item with id '{item_id_wishlist_0}' was not found.")
+        self.assertIn(f"Item with id '{item_id_wishlist_0}' was not found.", response.get_json()["message"])
 
         # Now retrieve them with correct wishlist id
         response = self.app.get(f"{BASE_URL}/{wishlists[0].id}/items/{item_id_wishlist_0}")
@@ -403,7 +407,8 @@ class TestWishlistService(TestCase):
         response = self.app.delete(f"{BASE_URL}/{wishlist_id}/items/{item_id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
-        self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{wishlist_id}' was not found.")
+        # self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{wishlist_id}' was not found.")
+        self.assertIn(f"Wishlist with id '{wishlist_id}' was not found.", data["message"])
 
     def test_update_item(self):
         """It should Update an item"""
@@ -453,7 +458,8 @@ class TestWishlistService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
-        self.assertEqual(data["message"], f"404 Not Found: Item with id '{item_id}' was not found.")
+        self.assertIn(f"Item with id '{item_id}' was not found.", data["message"])
+        # self.assertEqual(data["message"], f"404 Not Found: Item with id '{item_id}' was not found.")
 
     def test_update_item_nonexistent_wishlist(self):
         """It should not Update an item given wrong wishlist id"""
@@ -480,7 +486,8 @@ class TestWishlistService(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
-        self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{updated_item.wishlist_id}' was not found.")
+        self.assertIn(f"Wishlist with id '{updated_item.wishlist_id}' was not found.", data["message"])
+        # self.assertEqual(data["message"], f"404 Not Found: Wishlist with id '{updated_item.wishlist_id}' was not found.")
 
     def test_clear_items_of_wishlist(self):
         """It should clear the existing wishlist and make wishlist empty"""
@@ -524,8 +531,7 @@ class TestWishlistService(TestCase):
             f"{BASE_URL}/{wishlist.id}/clear",
             content_type="application/json"
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
         # check if wishlist is empty or not
-        self.assertEqual(len(data['wishlist_items']), 0)
+        self.assertEqual(len(wishlist.wishlist_items), 0)

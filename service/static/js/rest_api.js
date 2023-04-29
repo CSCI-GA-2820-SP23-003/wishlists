@@ -57,7 +57,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: "/wishlists",
+            url: "/api/wishlists",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -89,7 +89,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/wishlists/${wishlist_id}`,
+                url: `/api/wishlists/${wishlist_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -115,7 +115,7 @@ $(function () {
         $("#flash_message").empty();
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists/${wishlist_id}`,
+            url: `/api/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -146,17 +146,17 @@ $(function () {
         let query = ""
 
         if (id) {
-           get_url = `/wishlists/${id}`
+           get_url = `/api/wishlists/${id}`
         }
         else if (owner_id){
             query += 'owner_id=' + owner_id
-            get_url = `/wishlists?${query}`
+            get_url = `/api/wishlists?${query}`
         } else if (name) {
             query += 'name=' + name
-            get_url = `/wishlists?${query}`
+            get_url = `/api/wishlists?${query}`
         }
         else {
-            get_url = `/wishlists`
+            get_url = `/api/wishlists`
         }
         $("#flash_message").empty();
 
@@ -220,7 +220,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/wishlists/${wishlist_id}`,
+            url: `/api/wishlists/${wishlist_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -250,7 +250,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/wishlists/${wishlist_id}/clear`,
+            url: `/api/wishlists/${wishlist_id}/clear`,
             contentType: "application/json",
             data: ''
         })
@@ -303,7 +303,7 @@ $(function () {
         console.log(wishlist_id);
         let ajax = $.ajax({
             type: "POST",
-            url: `/wishlists/${wishlist_id}/items`,
+            url: `/api/wishlists/${wishlist_id}/items`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -331,7 +331,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/wishlists/${wishlist_id}/items/${item_id}`,
+            url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
             contentType: "application/json",
             data: '',
         });
@@ -373,7 +373,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/wishlists/${wishlist_id}/items/${item_id}`,
+                url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data),
             });
@@ -402,12 +402,12 @@ $(function () {
         let queryString = ""
 
         if(item_id){
-            get_url = `/wishlists/${item_id}/items/${item_id}`
+            get_url = `/api/wishlists/${item_id}/items/${item_id}`
         } else if (product_name){
             queryString += 'name=' + product_name
-            get_url = `/wishlists/${wishlist_id}/items?${queryString}`
+            get_url = `/api/wishlists/${wishlist_id}/items?${queryString}`
         } else{
-            get_url = `/wishlists/${wishlist_id}/items`
+            get_url = `/api/wishlists/${wishlist_id}/items`
         }
 
         $("#flash_message").empty();
@@ -476,7 +476,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/wishlists/${wishlist_id}/items/${item_id}`,
+            url: `/api/wishlists/${wishlist_id}/items/${item_id}`,
             contentType: "application/json",
             data: '',
         });
