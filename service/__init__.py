@@ -20,10 +20,10 @@ app.url_map.strict_slashes = False
 ######################################################################
 api = Api(app,
           version='1.0.0',
-          title='Pet Demo REST API Service',
-          description='This is a sample server Pet store server.',
-          default='pets',
-          default_label='Pet shop operations',
+          title='Wishlist Demo REST API Service',
+          description='This is Wishlists microservice for an e-commerce app.',
+          default='wishlists',
+          default_label='Wishlist operations',
           doc='/apidocs',  # default also could use doc='/apidocs/'
           prefix='/api',
           )
