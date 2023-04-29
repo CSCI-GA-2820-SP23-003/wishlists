@@ -4,7 +4,7 @@ My Service
 Describe what your service does here
 """
 
-from flask import jsonify, request, url_for, make_response
+from flask import jsonify
 from flask_restx import fields, reqparse, Resource
 from service.common import status  # HTTP Status Codes
 from service.models import Wishlist, Item
@@ -80,14 +80,16 @@ def index():
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}
 ######################################################################
+
+
 @api.route("/wishlists/<wishlist_id>")
 @api.param("wishlist_id", "The Wishlist identifier")
 class WishlistResource(Resource):
     """Handles all routes for the wishlist model."""
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # RETRIEVE A WISHLIST
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.doc("get_wishlist")
     @api.response(404, "Wishlist not found.")
     @api.marshal_list_with(wishlist_model)
@@ -102,12 +104,12 @@ class WishlistResource(Resource):
         wishlist = Wishlist.find(wishlist_id)
 
         if not wishlist:
-            abort(status.HTTP_404_NOT_FOUND, "Wishlist with id '{}' was not found.".format(wishlist_id))
+            abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
         return wishlist.serialize(), status.HTTP_200_OK
 
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # UPDATE AN EXISTING WISHLIST
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     @api.doc("update_wishlists")
     @api.response(404, "Wishlist not found")
     @api.response(400, "The posted Wishlist data was not valid")
@@ -122,7 +124,7 @@ class WishlistResource(Resource):
         wishlist = Wishlist.find(wishlist_id)
 
         if not wishlist:
-            abort(status.HTTP_404_NOT_FOUND, "Wishlist with id '{}' was not found.".format(wishlist_id))
+            abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
         app.logger.debug('Payload = %s', api.payload)
         data = api.payload
         wishlist.deserialize(data)
@@ -143,12 +145,6 @@ class WishlistResource(Resource):
         app.logger.info("Request to delete wishlist with id: %s", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
 
-        # if wishlist:
-        #     while wishlist.items:
-        #         item = wishlist.items[0]
-        #         wishlist.items.remove(item)
-        #         item.delete()
-                
         if wishlist:
             wishlist.delete()
             app.logger.info('Wishlist with ID [%s] delete complete.', wishlist_id)
@@ -157,6 +153,8 @@ class WishlistResource(Resource):
 ######################################################################
 #  PATH: /wishlists
 ######################################################################
+
+
 @api.route('/wishlists', strict_slashes=False)
 class WishlistCollection(Resource):
     """ Handles all interactions with collections of Wishlists """
@@ -209,6 +207,8 @@ class WishlistCollection(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/clear
 ######################################################################
+
+
 @api.route("/wishlists/<wishlist_id>/clear", strict_slashes=False)
 @api.param("wishlist_id", "The wishlist ID")
 class ClearWishlistResource(Resource):
@@ -250,6 +250,8 @@ class ClearWishlistResource(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items/{item_id}
 ######################################################################
+
+
 @api.route("/wishlists/<int:wishlist_id>/items/<int:item_id>", strict_slashes=False)
 @api.param("wishlist_id", "The Wishlist identifier")
 @api.param("item_id", "The Wishlist Item identifier")
@@ -353,11 +355,13 @@ class ItemResource(Resource):
 ######################################################################
 #  PATH: /wishlists/{wishlist_id}/items
 ######################################################################
+
+
 @api.route('/wishlists/<int:wishlist_id>/items', strict_slashes=False)
 @api.param('wishlist_id', 'The Wishlist identifier')
 class ItemCollection(Resource):
-    """ 
-    Handles all interactions with collections of Wishlist Items 
+    """
+    Handles all interactions with collections of Wishlist Items
     """
     # ------------------------------------------------------------------
     # LIST ALL ITEMS FOR A WISHLIST
@@ -374,7 +378,7 @@ class ItemCollection(Resource):
         results = [item.serialize() for item in wishlist.wishlist_items]
         app.logger.info("Returning %d items", len(results))
         return results, status.HTTP_200_OK
-    
+
     # ------------------------------------------------------------------
     # ADD A NEW ITEM TO A WISHLIST
     # ------------------------------------------------------------------
