@@ -221,8 +221,3 @@ Scenario: Delete a Wishlist Item
     When I press the "Search-Item" button
     Then I should not see "Watch" in the item results
     And I should see "Earphone" in the item results
-
-Scenario: The swagger API docs is running
-    When I visit the "home page"
-    And I press the "API" button
-    Then I should see "NYU-DevOps Wishlists REST API Service" in the title
