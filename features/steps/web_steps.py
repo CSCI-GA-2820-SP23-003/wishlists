@@ -18,20 +18,20 @@ from selenium.webdriver.support import expected_conditions
 def step_impl(context):
     """ Delete all existing wishlist items and load new ones """
     # List all of the wishlist items and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}/wishlists"
+    rest_endpoint = f"{context.BASE_URL}/api/wishlists"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for wishlist in context.resp.json():
         wishlist_id = wishlist['id']
-        clear_endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/clear"
+        clear_endpoint = f"{context.BASE_URL}/api/wishlists/{wishlist_id}/clear"
         context.resp = requests.put(clear_endpoint)
-        expect(context.resp.status_code).to_equal(200)
+        expect(context.resp.status_code).to_equal(204)
 
     # Load the database with new wishlist items
     for row in context.table:
         wishlist_name = row['wishlist_name']
         query = 'name=' + wishlist_name
-        rest_endpoint = f"{context.BASE_URL}/wishlists?{query}"
+        rest_endpoint = f"{context.BASE_URL}/api/wishlists?{query}"
         context.resp = requests.get(rest_endpoint)
         wishlist_id = context.resp.json()[0]['id']
         payload = {
@@ -41,7 +41,7 @@ def step_impl(context):
             "item_quantity": int(row['quantity']),
             "id": None
         }
-        endpoint = f"{context.BASE_URL}/wishlists/{wishlist_id}/items"
+        endpoint = f"{context.BASE_URL}/api/wishlists/{wishlist_id}/items"
         context.resp = requests.post(endpoint, json=payload)
         expect(context.resp.status_code).to_equal(201)
 

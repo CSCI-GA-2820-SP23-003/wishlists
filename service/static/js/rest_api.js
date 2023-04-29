@@ -81,8 +81,10 @@ $(function () {
 
         let wishlist_id = $("#wishlist_id").val();
         let name = $("#wishlist_name").val();        
+        let owner_id = $("#owner_id").val();
         let data = {
             "name": name,
+            "owner_id": parseInt(owner_id),
         };
 
         $("#flash_message").empty();
