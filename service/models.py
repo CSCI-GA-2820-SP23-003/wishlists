@@ -134,7 +134,7 @@ class Wishlist(db.Model):
     @classmethod
     def find(cls, wishlist_id):
         """ Finds a Wishlist by it's ID """
-        logger.info("Processing lookup for id %s ...", wishlist_id)
+        logger.info("Processing lookup for wishlist id %s ...", wishlist_id)
         return cls.query.get(wishlist_id)
 
     @classmethod
@@ -202,7 +202,7 @@ class Item(db.Model):
 
     def delete(self):
         """ Removes an Item from the data store """
-        logger.info("Deleting %s from %s", self.product_name, self.wishlist_id)
+        logger.info("Deleting product %s from wishlist %s", self.product_name, self.wishlist_id)
         db.session.delete(self)
         db.session.commit()
 
@@ -267,7 +267,7 @@ class Item(db.Model):
     @classmethod
     def find(cls, item_id):
         """ Finds an Item by it's ID """
-        logger.info("Processing lookup for id %s ...", item_id)
+        logger.info("Processing lookup for item id %s ...", item_id)
         return cls.query.get(item_id)
 
     @classmethod
