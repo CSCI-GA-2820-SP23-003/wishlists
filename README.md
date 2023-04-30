@@ -12,6 +12,20 @@ Wishlist Service - Represents the wishlists created by Customers at an eCommerce
 
 This project contains the code for Wishlist Service. The service consists of Wishlist Resource and WishlistItem Resource (subordinate). The `/service` folder contains a `models.py` file for Wishlist and WishlistItems models and a `routes.py` file for the service. The `/tests` folder contains the test cases for testing the model and the service separately.
 
+## Running the service
+
+Given that you have cloned the repository. Use the below command in the repo folder:
+``` text
+$ code .
+```
+opens the repo in VSCode, where you need to select the option to `Reopen in Containers` which brings up the `wishlist:app` and `postgres` images.
+
+The project uses honcho which gets it's commands from the `Procfile`. To start the service simply use:
+``` text
+$ honcho start
+```
+You should be able to reach the service at: http://localhost:8080. The port that is used is controlled by an environment variable defined in the .flaskenv file which Flask uses to load it's configuration from the environment by default. Going to the above URL localhost:8080, you will see a page where you will be able to perform various operation on wishlists and its items.
+
 
 ## Manual Setup
 
@@ -32,6 +46,10 @@ run command as follow in command line
 ```bash
 nosetests
 ```
+To run the BDD tests, after running ```honcho start```, run the following command in a separate shell
+```bash
+behave
+```
 
 ## Contents
 
@@ -45,6 +63,13 @@ The project contains the following:
 dot-env-example     - copy to .env to use environment variables
 requirements.txt    - list if Python libraries required by your code
 config.py           - configuration parameters
+
+features/                     - feature python package
+├── environment.py            - environment file for BDD tests
+├── wishlists.feature         - Behave feature file
+└── steps                     - Behave Step packages
+    ├── web_steps.py          - Behave Step Definitions
+    └── wishlists_steps.py    - Behave Step Definition for adding Data
 
 service/                     - service python package
 ├── __init__.py              - package initializer
