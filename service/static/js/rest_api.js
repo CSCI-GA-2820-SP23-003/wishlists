@@ -505,5 +505,4 @@ $(function () {
         $("#flash_message").empty();
         clear_form_data()
     });
-
 })
