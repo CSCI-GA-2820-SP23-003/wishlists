@@ -100,7 +100,7 @@ class WishlistResource(Resource):
         """
 
         app.logger.info("Request to get wishlist with id %s", wishlist_id)
-        
+       
         wishlist = Wishlist.find(wishlist_id)
 
         if not wishlist:
