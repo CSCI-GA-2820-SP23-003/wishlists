@@ -82,7 +82,7 @@ def index():
 ######################################################################
 
 
-@api.route("/wishlists/<wishlist_id>")
+@api.route("/wishlists/<int:wishlist_id>")
 @api.param("wishlist_id", "The Wishlist identifier")
 class WishlistResource(Resource):
     """Handles all routes for the wishlist model."""
@@ -211,7 +211,7 @@ class WishlistCollection(Resource):
 ######################################################################
 
 
-@api.route("/wishlists/<wishlist_id>/clear", strict_slashes=False)
+@api.route("/wishlists/<int:wishlist_id>/clear", strict_slashes=False)
 @api.param("wishlist_id", "The wishlist ID")
 class ClearWishlistResource(Resource):
     """ Clear action on a Wishlist """
