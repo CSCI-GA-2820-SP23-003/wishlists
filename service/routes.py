@@ -95,8 +95,8 @@ class WishlistResource(Resource):
     @api.marshal_list_with(wishlist_model)
     def get(self, wishlist_id):
         """
-        Retrieve a single wishlist
-        This endpoint will return a wishlist based on it's id
+        Retrieves a Wishlist.
+        This endpoint will return a wishlist based on its ID.
         """
 
         app.logger.info("Request to get wishlist with id %s", wishlist_id)
@@ -117,8 +117,8 @@ class WishlistResource(Resource):
     @api.marshal_with(wishlist_model)
     def put(self, wishlist_id):
         """
-        Updates a wishlist
-        This endpoint will update a Wishlist based the body that is posted
+        Updates a Wishlist.
+        This endpoint will update a Wishlist based the body that is posted.
         """
         app.logger.info("Request to update wishlist %s", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
@@ -139,8 +139,8 @@ class WishlistResource(Resource):
     @api.response(204, "Wishlist Deleted")
     def delete(self, wishlist_id):
         """
-        Deletes a wishlist
-        This endpoint will delete a wishlist based on the id specified in the path
+        Deletes a Wishlist.
+        This endpoint will delete a wishlist based on the ID specified in the path.
         """
         app.logger.info("Request to delete wishlist with id: %s", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
@@ -165,7 +165,10 @@ class WishlistCollection(Resource):
     @api.expect(wishlist_args, validate=True)
     @api.marshal_list_with(wishlist_model)
     def get(self):
-        """List all of the Wishlists"""
+        """
+        Lists all Wishlists.
+        This endpoint will list all available Wishlists.
+        """
         app.logger.info('Request to list Wishlists...')
         wishlists = []
         args = wishlist_args.parse_args()
@@ -192,9 +195,8 @@ class WishlistCollection(Resource):
     @api.marshal_with(wishlist_model, code=201)
     def post(self):
         """
-        Creates a Wishlist
-
-        This endpoint will create a Wishlist based on the data in the body that is posted
+        Creates a Wishlist.
+        This endpoint will create a Wishlist based on the data in the body that is posted.
         """
         app.logger.info('Request to Create a Wishlist')
         wishlist = Wishlist()
@@ -219,21 +221,14 @@ class ClearWishlistResource(Resource):
     @api.marshal_list_with(wishlist_model)
     def put(self, wishlist_id):
         """
-        Clears a wishlist of all the items
-        This endpoint will remove all items in a Wishlist and make it unavailable
+        Clears a Wishlist of all its Items.
+        This endpoint will remove all items in a Wishlist and make it unavailable.
         """
         app.logger.info("Request to clear wishlist %s", wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
 
         if not wishlist:
             abort(status.HTTP_404_NOT_FOUND, f'Wishlist with id {wishlist_id} was not found.')
-
-        # wishlist_data = wishlist.serialize()
-        # for items in wishlist_data["wishlist_items"]:
-        #     Item.find(items["id"]).delete()
-        # wishlist_data["wishlist_items"] = []
-        # wishlist.deserialize(wishlist_data)
-        # wishlist.update()
 
         while wishlist.wishlist_items:
             item = wishlist.wishlist_items[0]
@@ -273,8 +268,8 @@ class ItemResource(Resource):
     @api.marshal_with(item_model)
     def get(self, wishlist_id, item_id):
         """
-        Retrieve a single wishlist
-        This endpoint will return a wishlist item based on it's id
+        Retrieves an Item from a Wishlist.
+        This endpoint will return a wishlist item based on its ID.
         """
         app.logger.info('Request to retrieve an Item %s from Wishlist with id: %s', item_id, wishlist_id)
 
@@ -300,9 +295,8 @@ class ItemResource(Resource):
     @api.response(204, "Wishlist Item Deleted")
     def delete(self, wishlist_id, item_id):
         """
-        Delete an item from a wishlist
-
-        This endpoint will delete a Wishlist Item based on the id specified in the path
+        Deletes an Item from a Wishlist.
+        This endpoint will delete a Wishlist Item based on the ID specified in the path.
         """
 
         app.logger.info('Request to delete item with wishlist_id [%s] and item_id [%s] ...', item_id, wishlist_id)
@@ -326,9 +320,8 @@ class ItemResource(Resource):
     @api.marshal_with(item_model)
     def put(self, wishlist_id, item_id):
         """
-        Update an item from a wishlist
-
-        This endpoint will update a Wishlist Item based on the body that is posted
+        Updates an Item in a Wishlist.
+        This endpoint will update a Wishlist Item based on the body that is posted.
         """
 
         app.logger.info("Request to update product %d in wishlist %d", wishlist_id, item_id)
@@ -369,7 +362,10 @@ class ItemCollection(Resource):
     @api.doc('list_wishlist_items')
     @api.marshal_list_with(item_model)
     def get(self, wishlist_id):
-        """List all of the Items from a Wishlist"""
+        """
+        Lists all Items in a Wishlist.
+        This endpoint lists all Items in a Wishlist.
+        """
         app.logger.info('Request to list Items for Wishlist with id: %s', wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
         if not wishlist:
@@ -388,9 +384,8 @@ class ItemCollection(Resource):
     @api.marshal_with(item_model, code=201)
     def post(self, wishlist_id):
         """
-        Create an item in a wishlist
-
-        This endpoint will add a new item to a wishlist
+        Create an Item in a Wishlist.
+        This endpoint will add a new item to a wishlist.
         """
         app.logger.info('Request to create an Item for Wishlist with id: %s', wishlist_id)
         wishlist = Wishlist.find(wishlist_id)
