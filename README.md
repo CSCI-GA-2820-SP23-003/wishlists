@@ -12,6 +12,13 @@ Wishlist Service - Represents the wishlists created by Customers at an eCommerce
 
 This project contains the code for Wishlist Service. The service consists of Wishlist Resource and WishlistItem Resource (subordinate). The `/service` folder contains a `models.py` file for Wishlist and WishlistItems models and a `routes.py` file for the service. The `/tests` folder contains the test cases for testing the model and the service separately.
 
+## Accessing the Wishlists service on Cloud
+The service is currently hosted on a Kubernetes Cluster on IBM Cloud.
+
+Dev: http://159.122.186.135:31001/
+
+Prod: http://159.122.186.135:31002/
+
 ## Running the service
 
 Given that you have cloned the repository. Use the below command in the repo folder:
