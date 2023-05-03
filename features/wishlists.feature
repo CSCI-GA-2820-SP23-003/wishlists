@@ -144,7 +144,7 @@ Scenario: Search for Wishlist Item with given name
     And I press the "Search-Item" button
     Then I should see the message "Success"
     And I should see "Watch" in the item results
-    And I should see "Earphone" in the item results
+    And I should not see "Earphone" in the item results
     And I should not see "Milk" in the item results
 
 Scenario: Empty a Wishlist
