@@ -404,7 +404,7 @@ $(function () {
         let queryString = ""
 
         if(item_id){
-            get_url = `/api/wishlists/${item_id}/items/${item_id}`
+            get_url = `/api/wishlists/${wishlist_id}/items/${item_id}`
         } else if (product_name){
             queryString += 'name=' + product_name
             get_url = `/api/wishlists/${wishlist_id}/items?${queryString}`
