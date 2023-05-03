@@ -51,8 +51,10 @@ wishlist_model = api.inherit(
 wishlist_args = reqparse.RequestParser()
 wishlist_args.add_argument('name', type=str, location='args', required=False, help='List Wishlists by name')
 wishlist_args.add_argument('owner_id', type=int, location='args', required=False, help='List Wishlists by Owner ID')
-wishlist_args.add_argument('product_name', type=int, location='args', required=False,
-                           help='List Wishlist Items by product name')
+wishlist_item_args = reqparse.RequestParser()
+wishlist_item_args.add_argument('name', type=str, location='args', required=False,
+                                help='List Wishlist Items by product name')
+
 
 ######################################################################
 # GET HEALTH CHECK
@@ -360,6 +362,8 @@ class ItemCollection(Resource):
     # LIST ALL ITEMS FOR A WISHLIST
     # ------------------------------------------------------------------
     @api.doc('list_wishlist_items')
+    @api.expect(wishlist_item_args, validate=True)
+    @api.response(404, "No wishlist found.")
     @api.marshal_list_with(item_model)
     def get(self, wishlist_id):
         """
@@ -371,7 +375,14 @@ class ItemCollection(Resource):
         if not wishlist:
             abort(status.HTTP_404_NOT_FOUND, f"Wishlist with id '{wishlist_id}' was not found.")
 
-        results = [item.serialize() for item in wishlist.wishlist_items]
+        args = wishlist_item_args.parse_args()
+        app.logger.info('Request to product_name %s for Wishlist with id: %s', args['name'], wishlist_id)
+        if args['name']:
+            items = Item.find_by_name(args['name'])
+        else:
+            items = Item.find_by_wishlist_id(wishlist_id)
+
+        results = [item.serialize() for item in items]
         app.logger.info("Returning %d items", len(results))
         return results, status.HTTP_200_OK
 
